@@ -37,7 +37,8 @@ Los datos de prueba quedan en `.datos/`.
 ## Publicarlo en Vercel (cuenta personal andreamperezp)
 
 1. Subí la carpeta a un repo de GitHub e importalo en Vercel (Framework: **Other**, sin build).
-2. En **Storage → Create → Blob**, creá un store y conectalo al proyecto (agrega `BLOB_READ_WRITE_TOKEN` solo).
+2. En **Storage → Create → Blob**, creá un store privado y conectalo al proyecto (agrega `BLOB_STORE_ID` solo).
+   Ya está hecho: el store se llama `radar-datos`.
 3. En **Settings → Environment Variables** cargá:
 
 | Variable | Qué es |
