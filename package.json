@@ -1,0 +1,17 @@
+{
+  "name": "radar",
+  "version": "1.0.0",
+  "description": "Radar de vacantes: busca cada día trabajos publicados hoy que encajan con tu CV",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "dev": "node dev.mjs"
+  },
+  "type": "module",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.134.0",
+    "@vercel/blob": "^2.8.2"
+  },
+  "private": true
+}

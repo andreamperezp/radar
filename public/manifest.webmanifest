@@ -1,0 +1,9 @@
+{
+  "name": "Radar de vacantes",
+  "short_name": "Radar",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F7F5F1",
+  "theme_color": "#1E2430",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

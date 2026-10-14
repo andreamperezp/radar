@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar de vacantes</title>
+<meta name="description" content="Busca cada día trabajos publicados hoy que encajan con el CV de Andrea Pérez.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1E2430">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifest.webmanifest">
+<style>
+@font-face { font-family: 'Manrope'; font-weight: 200 800; font-display: swap; src: url(/fonts/manrope-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2190-2199, U+2212; }
+@font-face { font-family: 'Manrope'; font-weight: 200 800; font-display: swap; src: url(/fonts/manrope-latin-ext.woff2) format('woff2'); unicode-range: U+0100-024F, U+1E00-1EFF, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'JetBrains Mono'; font-weight: 100 800; font-display: swap; src: url(/fonts/jetbrains-mono-latin.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2190-2199, U+2212; }
+@font-face { font-family: 'JetBrains Mono'; font-weight: 100 800; font-display: swap; src: url(/fonts/jetbrains-mono-latin-ext.woff2) format('woff2'); unicode-range: U+0100-024F, U+1E00-1EFF; }
+
+:root {
+  --fondo: #F7F5F1; --tinta: #1E2430; --tinta-suave: #333B4B; --gris: #6B7280; --linea: #E4DFD6;
+  --tarjeta: #FFFFFF; --menta: #A9DCC0; --menta-fuerte: #2F7D5B; --coral: #EE9B7E; --coral-fuerte: #B4553A; --sol: #F2CF7E;
+  --sombra: 0 1px 2px rgba(30,36,48,.06), 0 8px 24px rgba(30,36,48,.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fondo: #151A23; --tinta: #F7F5F1; --tinta-suave: #D5D1C8; --gris: #9AA1AD; --linea: #2A3140;
+    --tarjeta: #1E2430; --menta: #7FC8A5; --menta-fuerte: #A9DCC0; --coral-fuerte: #F4B39A; --sombra: 0 8px 24px rgba(0,0,0,.25);
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--fondo); color: var(--tinta); font: 16px/1.55 'Manrope', system-ui, sans-serif; }
+.mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+a { color: inherit; }
+button { font: inherit; cursor: pointer; }
+.envoltura { max-width: 980px; margin: 0 auto; padding: 24px 16px 80px; }
+
+header.barra { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.marca { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.02em; font-size: 18px; text-decoration: none; }
+.marca img { width: 32px; height: 32px; }
+.pestanas { display: flex; gap: 4px; background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 999px; padding: 4px; }
+.pestanas button { border: 0; background: none; color: var(--gris); padding: 6px 14px; border-radius: 999px; font-size: 14px; font-weight: 600; }
+.pestanas button[aria-selected="true"] { background: var(--tinta); color: var(--fondo); }
+
+.portada { display: grid; grid-template-columns: 1.15fr .85fr; gap: 32px; align-items: center; margin: 48px 0 32px; }
+.kicker { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--coral-fuerte); }
+h1 { font-size: clamp(32px, 5.5vw, 52px); line-height: 1.04; letter-spacing: -.035em; margin: 10px 0 14px; font-weight: 800; }
+h1 em { font-style: normal; background: linear-gradient(transparent 62%, var(--resaltado, var(--menta)) 62%); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --resaltado: color-mix(in srgb, var(--menta) 35%, transparent); } }
+.bajada { color: var(--tinta-suave); max-width: 46ch; margin: 0 0 22px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 26px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--linea); background: var(--tarjeta); border-radius: 999px; padding: 5px 12px; font-size: 13px; }
+.chip button { border: 0; background: none; padding: 0; color: var(--coral-fuerte); font-weight: 700; font-size: 13px; }
+.punto { width: 8px; height: 8px; border-radius: 50%; background: var(--gris); }
+.punto.ok { background: #3FAF7A; } .punto.no { background: var(--coral); }
+
+.boton-buscar { position: relative; border: 0; background: var(--tinta); color: var(--fondo); border-radius: 18px; padding: 20px 28px; font-weight: 800; letter-spacing: .06em; font-size: 16px; display: inline-flex; align-items: center; gap: 14px; box-shadow: 0 10px 30px rgba(30,36,48,.18); transition: transform .15s ease, box-shadow .15s ease; }
+.boton-buscar:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(30,36,48,.24); }
+.boton-buscar:disabled { opacity: .75; cursor: progress; transform: none; }
+.boton-buscar .flecha { width: 28px; height: 28px; border-radius: 50%; background: var(--coral); display: grid; place-items: center; color: var(--tinta); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .boton-buscar { background: var(--menta); color: #151A23; } }
+
+/* Radar animado */
+.radar { position: relative; aspect-ratio: 1; width: 100%; max-width: 360px; justify-self: center; border-radius: 50%;
+  background: radial-gradient(circle, transparent 0 22%, var(--linea) 22.3% 22.8%, transparent 23% 46%, var(--linea) 46.3% 46.8%, transparent 47% 70%, var(--linea) 70.3% 70.8%, transparent 71%), var(--tarjeta);
+  box-shadow: var(--sombra); overflow: hidden; }
+.radar::before, .radar::after { content: ''; position: absolute; background: var(--linea); }
+.radar::before { left: 50%; top: 0; bottom: 0; width: 1px; } .radar::after { top: 50%; left: 0; right: 0; height: 1px; }
+.barrido { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, transparent 0 300deg, color-mix(in srgb, var(--menta) 70%, transparent) 360deg); animation: girar 6s linear infinite; }
+.buscando .barrido { animation-duration: 1.6s; }
+@keyframes girar { to { transform: rotate(360deg); } }
+.blip { position: absolute; width: 12px; height: 12px; margin: -6px; border-radius: 50%; background: var(--coral); box-shadow: 0 0 0 0 rgba(238,155,126,.6); animation: latido 2.4s ease-out infinite; z-index: 2; }
+@keyframes latido { 0% { box-shadow: 0 0 0 0 rgba(238,155,126,.55); } 100% { box-shadow: 0 0 0 16px rgba(238,155,126,0); } }
+.radar .centro { position: absolute; left: 50%; top: 50%; width: 12px; height: 12px; margin: -6px; border-radius: 50%; background: var(--tinta); z-index: 2; }
+@media (prefers-reduced-motion: reduce) { .barrido, .blip { animation: none; } }
+
+.pasos { list-style: none; padding: 0; margin: 20px 0 0; display: grid; gap: 8px; font-size: 14px; color: var(--gris); }
+.pasos[hidden], .informe[hidden], .pasos li[hidden] { display: none; }
+.pasos li { display: flex; gap: 10px; align-items: center; }
+.pasos li::before { content: ''; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--linea); flex: none; }
+.pasos li.activo { color: var(--tinta); font-weight: 600; } .pasos li.activo::before { border-color: var(--coral); border-top-color: transparent; animation: girar .8s linear infinite; }
+.pasos li.hecho { color: var(--tinta-suave); } .pasos li.hecho::before { background: var(--menta); border-color: var(--menta); }
+
+.informe { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--gris); padding: 14px 0; border-top: 1px solid var(--linea); margin-top: 8px; }
+.informe b { color: var(--tinta); }
+.aviso { background: color-mix(in srgb, var(--sol) 30%, var(--tarjeta)); border: 1px solid color-mix(in srgb, var(--sol) 70%, var(--linea)); border-radius: 12px; padding: 10px 14px; font-size: 14px; margin: 10px 0; }
+.aviso.error { background: color-mix(in srgb, var(--coral) 22%, var(--tarjeta)); border-color: var(--coral); }
+
+.tarjetas { display: grid; gap: 14px; margin-top: 10px; }
+.vacante { background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 18px; padding: 20px; box-shadow: var(--sombra); display: grid; grid-template-columns: 64px 1fr; gap: 18px; animation: entrar .4s ease both; }
+@keyframes entrar { from { opacity: 0; transform: translateY(8px); } }
+.vacante.descartada { opacity: .5; } .vacante.aplicada { border-color: var(--menta); }
+.anillo { --p: 70; width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(var(--color, var(--menta-fuerte)) calc(var(--p) * 1%), var(--linea) 0); }
+.anillo span { width: 50px; height: 50px; border-radius: 50%; background: var(--tarjeta); display: grid; place-items: center; font-weight: 800; font-size: 15px; }
+.vacante h3 { margin: 0; font-size: 19px; letter-spacing: -.015em; line-height: 1.25; }
+.meta { font-size: 13px; color: var(--gris); margin: 4px 0 12px; display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.meta b { color: var(--tinta-suave); font-weight: 700; }
+.porque { margin: 0 0 8px; }
+.consejo { margin: 0; font-size: 14px; color: var(--tinta-suave); padding-left: 12px; border-left: 3px solid var(--coral); }
+.acciones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.acciones a, .acciones button { border: 1px solid var(--linea); background: none; color: var(--tinta); border-radius: 10px; padding: 8px 14px; font-size: 14px; font-weight: 600; text-decoration: none; }
+.acciones a.principal { background: var(--tinta); color: var(--fondo); border-color: var(--tinta); }
+.acciones button[aria-pressed="true"] { background: var(--menta); border-color: var(--menta); color: #1E2430; }
+.etiqueta { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; padding: 2px 8px; border-radius: 6px; background: var(--fondo); border: 1px solid var(--linea); }
+.vacio { text-align: center; padding: 40px 16px; color: var(--gris); background: var(--tarjeta); border: 1px dashed var(--linea); border-radius: 18px; }
+
+section[hidden] { display: none; }
+h2 { font-size: 26px; letter-spacing: -.025em; margin: 40px 0 6px; }
+.sub { color: var(--gris); margin: 0 0 18px; }
+.panel { background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 18px; padding: 22px; box-shadow: var(--sombra); display: grid; gap: 20px; }
+.campo label, .campo legend { display: block; font-weight: 700; margin-bottom: 8px; font-size: 15px; padding: 0; }
+.campo small { display: block; color: var(--gris); font-size: 13px; margin-top: 6px; }
+fieldset { border: 0; margin: 0; padding: 0; }
+select, input[type="text"], input[type="password"] { width: 100%; font: inherit; padding: 11px 12px; border: 1px solid var(--linea); border-radius: 10px; background: var(--fondo); color: var(--tinta); }
+.opciones { display: flex; flex-wrap: wrap; gap: 8px; }
+.opciones label { display: inline-flex; gap: 8px; align-items: center; border: 1px solid var(--linea); border-radius: 999px; padding: 7px 14px; font-weight: 600; font-size: 14px; margin: 0; cursor: pointer; }
+.opciones input { accent-color: var(--coral-fuerte); }
+input[type="range"] { width: 100%; accent-color: var(--coral-fuerte); }
+.fila { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.boton { border: 0; background: var(--tinta); color: var(--fondo); border-radius: 10px; padding: 10px 16px; font-weight: 700; font-size: 14px; }
+.boton.claro { background: none; color: var(--tinta); border: 1px solid var(--linea); }
+.guardado { font-size: 13px; color: var(--menta-fuerte); font-weight: 700; }
+.pasos-tg { margin: 0; padding-left: 20px; font-size: 14px; color: var(--tinta-suave); }
+.pasos-tg li { margin-bottom: 4px; }
+.pasos-tg code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--fondo); padding: 1px 5px; border-radius: 4px; }
+
+.filtros { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.filtros button { border: 1px solid var(--linea); background: var(--tarjeta); color: var(--tinta); border-radius: 999px; padding: 5px 12px; font-size: 13px; font-weight: 600; }
+.filtros button[aria-pressed="true"] { background: var(--tinta); color: var(--fondo); border-color: var(--tinta); }
+.dia { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--gris); margin: 22px 0 8px; }
+
+dialog { border: 0; border-radius: 18px; padding: 24px; width: min(420px, calc(100% - 32px)); background: var(--tarjeta); color: var(--tinta); box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+dialog::backdrop { background: rgba(21,26,35,.45); }
+dialog h3 { margin: 0 0 6px; } dialog p { margin: 0 0 14px; color: var(--gris); font-size: 14px; }
+footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: center; }
+
+@media (max-width: 760px) {
+  .portada { grid-template-columns: 1fr; margin-top: 28px; gap: 24px; }
+  .radar { max-width: 220px; order: -1; }
+  .fila { grid-template-columns: 1fr; }
+  .vacante { grid-template-columns: 1fr; gap: 12px; padding: 18px; }
+  .boton-buscar { width: 100%; justify-content: center; }
+  .pestanas button { padding: 6px 10px; }
+  .marca span { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="envoltura">
+  <header class="barra">
+    <a class="marca" href="/"><img src="/favicon.svg" alt=""><span>radar <span class="mono" style="color:var(--coral-fuerte)">· ap.</span></span></a>
+    <nav class="pestanas" role="tablist" aria-label="Secciones">
+      <button role="tab" aria-selected="true" data-ir="hoy">Hoy</button>
+      <button role="tab" aria-selected="false" data-ir="historial">Historial</button>
+      <button role="tab" aria-selected="false" data-ir="ajustes">Ajustes</button>
+    </nav>
+  </header>
+
+  <!-- HOY -->
+  <section id="hoy">
+    <div class="portada">
+      <div>
+        <div class="kicker mono" id="fecha-hoy">Hoy</div>
+        <h1>Vacantes de hoy que <em>encajan con vos</em>.</h1>
+        <p class="bajada">Al revés que un reclutador: el radar trabaja para vos. Busca ofertas publicadas hoy, las compara con tu CV y te dice por qué vale la pena postular.</p>
+        <div class="chips">
+          <span class="chip">📍 <span id="chip-ubicacion">…</span> <button data-ir="ajustes">cambiar</button></span>
+          <span class="chip"><span class="punto" id="punto-claude"></span><span id="txt-claude">Claude</span></span>
+          <span class="chip"><span class="punto" id="punto-tg"></span><span id="txt-tg">Telegram</span></span>
+        </div>
+        <button class="boton-buscar" id="buscar">BUSCAR NUEVO PROYECTO <span class="flecha" aria-hidden="true">→</span></button>
+        <ol class="pasos" id="pasos" hidden>
+          <li>Revisando Get on Board, Himalayas y Remote OK</li>
+          <li>Claude busca en LinkedIn, Computrabajo, Bumeran y más</li>
+          <li>Dejando solo lo publicado hoy y que podés tomar</li>
+          <li>Comparando cada vacante con tu CV</li>
+        </ol>
+      </div>
+      <div class="radar" id="radar" aria-hidden="true"><div class="barrido"></div><div class="centro"></div></div>
+    </div>
+
+    <div id="avisos"></div>
+    <div class="informe" id="informe" hidden></div>
+    <div class="tarjetas" id="resultados"></div>
+  </section>
+
+  <!-- HISTORIAL -->
+  <section id="historial" hidden>
+    <h2>Historial</h2>
+    <p class="sub">Todo lo que el radar ya te mostró. Marcá dónde aplicaste para llevar la cuenta.</p>
+    <div class="filtros" id="filtros">
+      <button aria-pressed="true" data-estado="todas">Todas</button>
+      <button aria-pressed="false" data-estado="nueva">Pendientes</button>
+      <button aria-pressed="false" data-estado="aplicada">Aplicadas</button>
+      <button aria-pressed="false" data-estado="descartada">Descartadas</button>
+    </div>
+    <div id="lista-historial"></div>
+  </section>
+
+  <!-- AJUSTES -->
+  <section id="ajustes" hidden>
+    <h2>Ajustes</h2>
+    <p class="sub">La búsqueda automática de cada día usa estos mismos ajustes.</p>
+    <form class="panel" id="form-ajustes">
+      <div class="fila">
+        <div class="campo">
+          <label for="ubicacion">¿Dónde querés trabajar?</label>
+          <select id="ubicacion" name="ubicacion"></select>
+          <input type="text" id="ubicacionLibre" name="ubicacionLibre" placeholder="Ej.: Córdoba, Argentina · Montevideo · remoto en México" style="margin-top:8px" hidden>
+          <small>"Hoy" se calcula con la hora de ese lugar.</small>
+        </div>
+        <fieldset class="campo">
+          <legend>Modalidad</legend>
+          <div class="opciones">
+            <label><input type="checkbox" name="modalidades" value="remoto"> Remoto</label>
+            <label><input type="checkbox" name="modalidades" value="hibrido"> Híbrido</label>
+            <label><input type="checkbox" name="modalidades" value="presencial"> Presencial</label>
+          </div>
+        </fieldset>
+      </div>
+      <div class="fila">
+        <div class="campo">
+          <label for="minimo">Vacantes por búsqueda: <span id="v-minimo" class="mono"></span></label>
+          <input type="range" id="minimo" name="minimo" min="3" max="6" step="1">
+          <small>Como mínimo 3 si hay. Si hoy no hay tantas que valgan la pena, te lo dice en vez de rellenar.</small>
+        </div>
+        <div class="campo">
+          <label for="puntajeMinimo">Exigencia del match: <span id="v-puntaje" class="mono"></span></label>
+          <input type="range" id="puntajeMinimo" name="puntajeMinimo" min="40" max="85" step="5">
+          <small>Más alto = menos vacantes, pero más afines a tu perfil.</small>
+        </div>
+      </div>
+      <div><button class="boton" type="submit">Guardar ajustes</button> <span class="guardado" id="guardado" hidden>Guardado ✓</span></div>
+    </form>
+
+    <h2>Avisos por Telegram</h2>
+    <p class="sub">Todos los días a las 12:00 (hora de Argentina) te llegan las vacantes del día al celular.</p>
+    <div class="panel">
+      <ol class="pasos-tg">
+        <li>En Telegram, hablale a <b>@BotFather</b>, mandá <code>/newbot</code> y elegí un nombre (por ejemplo "Radar de Andrea").</li>
+        <li>Copiá el token que te da y cargalo en Vercel como <code>TELEGRAM_BOT_TOKEN</code>.</li>
+        <li>Abrí tu bot nuevo y mandale "hola".</li>
+        <li>Tocá <b>Conectar</b> acá abajo.</li>
+      </ol>
+      <div class="opciones">
+        <button class="boton" type="button" id="tg-conectar">Conectar</button>
+        <button class="boton claro" type="button" id="tg-probar">Mandar prueba</button>
+        <label><input type="checkbox" id="avisar-manual"> Avisarme también cuando busco a mano</label>
+      </div>
+      <div id="tg-estado" class="sub" style="margin:0"></div>
+    </div>
+  </section>
+
+  <footer>Hecho para Andrea Pérez · <a href="https://andreaperez.dev">andreaperez.dev</a></footer>
+</div>
+
+<dialog id="dialogo-clave">
+  <form method="dialog" id="form-clave">
+    <h3>Tu clave</h3>
+    <p>El radar es solo tuyo. Escribí la clave que cargaste en Vercel como APP_PASSWORD.</p>
+    <input type="password" id="clave" autocomplete="current-password" required>
+    <div style="margin-top:14px"><button class="boton" value="ok">Entrar</button></div>
+  </form>
+</dialog>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const guardarLocal = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
+const leerLocal = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
+
+let estado = { ajustes: null, ubicaciones: [], historial: [] };
+
+async function api(ruta, cuerpo) {
+  const r = await fetch(`/api/${ruta}`, {
+    method: cuerpo ? 'POST' : 'GET',
+    headers: { 'Content-Type': 'application/json', 'x-clave': leerLocal('radar-clave') || '' },
+    body: cuerpo ? JSON.stringify(cuerpo) : undefined,
+  });
+  if (r.status === 401) { await pedirClave(); return api(ruta, cuerpo); }
+  const datos = await r.json().catch(() => ({ error: `Error ${r.status}` }));
+  if (!r.ok) throw new Error(datos.error || `Error ${r.status}`);
+  return datos;
+}
+
+function pedirClave() {
+  return new Promise((ok) => {
+    const d = $('#dialogo-clave');
+    d.showModal();
+    $('#form-clave').onsubmit = () => { guardarLocal('radar-clave', $('#clave').value); d.close(); ok(); };
+  });
+}
+
+// Pestañas
+function ir(seccion) {
+  for (const id of ['hoy', 'historial', 'ajustes']) $(`#${id}`).hidden = id !== seccion;
+  document.querySelectorAll('.pestanas button').forEach((b) => b.setAttribute('aria-selected', b.dataset.ir === seccion));
+  if (seccion === 'historial') cargarHistorial();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+document.querySelectorAll('[data-ir]').forEach((b) => b.addEventListener('click', () => ir(b.dataset.ir)));
+
+// Estado y ajustes
+function pintarEstado(datos) {
+  estado.ajustes = datos.ajustes; estado.ubicaciones = datos.ubicaciones;
+  const a = datos.ajustes;
+  const u = datos.ubicaciones.find((x) => x.id === a.ubicacion);
+  $('#chip-ubicacion').textContent = a.ubicacion === 'otra' ? (a.ubicacionLibre || 'Otra') : (u?.nombre || a.ubicacion);
+  $('#punto-claude').className = `punto ${datos.estado.claude ? 'ok' : 'no'}`;
+  $('#txt-claude').textContent = datos.estado.claude ? 'Claude conectado' : 'Sin Claude (palabras clave)';
+  const tg = datos.estado.telegram && datos.estado.telegramConectado;
+  $('#punto-tg').className = `punto ${tg ? 'ok' : 'no'}`;
+  $('#txt-tg').textContent = tg ? 'Telegram activo' : 'Telegram sin conectar';
+  $('#tg-estado').textContent = !datos.estado.telegram ? 'Falta cargar TELEGRAM_BOT_TOKEN en Vercel.' : (datos.estado.telegramConectado ? '✓ Tu chat está conectado.' : 'Bot listo: falta conectar tu chat.');
+
+  $('#ubicacion').innerHTML = datos.ubicaciones.map((x) => `<option value="${x.id}">${esc(x.nombre)}</option>`).join('');
+  $('#ubicacion').value = a.ubicacion;
+  $('#ubicacionLibre').value = a.ubicacionLibre || '';
+  $('#ubicacionLibre').hidden = a.ubicacion !== 'otra';
+  document.querySelectorAll('[name="modalidades"]').forEach((c) => { c.checked = a.modalidades.includes(c.value); });
+  $('#minimo').value = a.minimo; $('#puntajeMinimo').value = a.puntajeMinimo;
+  pintarRangos();
+}
+function pintarRangos() { $('#v-minimo').textContent = $('#minimo').value; $('#v-puntaje').textContent = `${$('#puntajeMinimo').value}%`; }
+$('#minimo').oninput = pintarRangos; $('#puntajeMinimo').oninput = pintarRangos;
+$('#ubicacion').onchange = () => { $('#ubicacionLibre').hidden = $('#ubicacion').value !== 'otra'; };
+
+$('#form-ajustes').onsubmit = async (e) => {
+  e.preventDefault();
+  const modalidades = [...document.querySelectorAll('[name="modalidades"]:checked')].map((c) => c.value);
+  const datos = await api('ajustes', {
+    ubicacion: $('#ubicacion').value, ubicacionLibre: $('#ubicacionLibre').value,
+    modalidades: modalidades.length ? modalidades : ['remoto'],
+    minimo: Number($('#minimo').value), puntajeMinimo: Number($('#puntajeMinimo').value),
+  });
+  pintarEstado(datos);
+  $('#guardado').hidden = false; setTimeout(() => { $('#guardado').hidden = true; }, 2200);
+};
+
+// Telegram
+$('#avisar-manual').checked = leerLocal('radar-avisar') === '1';
+$('#avisar-manual').onchange = (e) => guardarLocal('radar-avisar', e.target.checked ? '1' : '0');
+async function accionTelegram(accion, boton) {
+  boton.disabled = true;
+  try { await api('telegram', { accion }); $('#tg-estado').textContent = accion === 'conectar' ? '✓ Conectado. Revisá Telegram.' : '✓ Mensaje enviado.'; pintarEstado(await api('ajustes')); }
+  catch (e) { $('#tg-estado').textContent = e.message; }
+  boton.disabled = false;
+}
+$('#tg-conectar').onclick = (e) => accionTelegram('conectar', e.target);
+$('#tg-probar').onclick = (e) => accionTelegram('probar', e.target);
+
+// Tarjeta de vacante
+function colorPuntaje(p) { return p >= 85 ? 'var(--menta-fuerte)' : p >= 70 ? '#3FAF7A' : 'var(--coral)'; }
+function tarjeta(v, i = 0) {
+  const fecha = v.publicada ? new Date(v.publicada.length > 10 ? v.publicada : `${v.publicada}T12:00:00`).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) : '';
+  return `<article class="vacante ${v.estado || ''}" style="animation-delay:${i * 80}ms" data-url="${esc(v.url)}">
+    <div class="anillo" style="--p:${v.puntaje};--color:${colorPuntaje(v.puntaje)}"><span>${v.puntaje}%</span></div>
+    <div>
+      <h3>${esc(v.titulo)}</h3>
+      <div class="meta"><b>${esc(v.empresa)}</b><span>📍 ${esc(v.ubicacion)}</span><span>${esc(v.fuente)}${v.publicada && v.publicada.length > 10 ? ` · publicada ${fecha}` : ' · publicada hoy'}</span>${v.salario ? `<span>💰 ${esc(v.salario)}</span>` : ''}<span class="etiqueta">${v.idioma === 'en' ? 'inglés' : 'español'}</span></div>
+      <p class="porque">${esc(v.porQue)}</p>
+      <p class="consejo">${esc(v.comoDestacar)}</p>
+      <div class="acciones">
+        <a class="principal" href="${esc(v.url)}" target="_blank" rel="noopener">Ver y postular →</a>
+        <button data-estado="aplicada" aria-pressed="${v.estado === 'aplicada'}">Ya apliqué</button>
+        <button data-estado="descartada" aria-pressed="${v.estado === 'descartada'}">No me interesa</button>
+      </div>
+    </div>
+  </article>`;
+}
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('.vacante [data-estado]');
+  if (!b) return;
+  const art = b.closest('.vacante');
+  const nuevo = b.getAttribute('aria-pressed') === 'true' ? 'nueva' : b.dataset.estado;
+  art.querySelectorAll('[data-estado]').forEach((x) => x.setAttribute('aria-pressed', x.dataset.estado === nuevo));
+  art.classList.remove('aplicada', 'descartada'); if (nuevo !== 'nueva') art.classList.add(nuevo);
+  const { historial } = await api('historial', { url: art.dataset.url, estado: nuevo });
+  estado.historial = historial;
+});
+
+// Radar: puntos que aparecen con cada resultado
+function ponerBlips(n) {
+  document.querySelectorAll('.blip').forEach((b) => b.remove());
+  for (let i = 0; i < n; i++) {
+    const ang = (i / Math.max(n, 1)) * Math.PI * 2 + 0.6, r = 18 + (i % 3) * 11;
+    const b = document.createElement('div'); b.className = 'blip';
+    b.style.left = `${50 + Math.cos(ang) * r}%`; b.style.top = `${50 + Math.sin(ang) * r}%`; b.style.animationDelay = `${i * 0.3}s`;
+    $('#radar').appendChild(b);
+  }
+}
+
+// BUSCAR
+let temporizadores = [];
+function animarPasos(conClaude) {
+  const pasos = [...document.querySelectorAll('#pasos li')];
+  $('#pasos').hidden = false;
+  pasos.forEach((p) => { p.className = ''; });
+  pasos[1].hidden = !conClaude;
+  const visibles = pasos.filter((p) => !p.hidden);
+  const tiempos = conClaude ? [0, 12000, 55000, 75000] : [0, 9000, 18000];
+  visibles.forEach((p, i) => temporizadores.push(setTimeout(() => { visibles.forEach((x, j) => { x.className = j < i ? 'hecho' : j === i ? 'activo' : ''; }); }, tiempos[i])));
+}
+$('#buscar').onclick = async () => {
+  const boton = $('#buscar');
+  boton.disabled = true; boton.firstChild.textContent = 'BUSCANDO… ';
+  $('#radar').classList.add('buscando'); $('#avisos').innerHTML = ''; $('#informe').hidden = true; $('#resultados').innerHTML = '';
+  animarPasos($('#punto-claude').classList.contains('ok'));
+  try {
+    const { vacantes, informe } = await api('buscar', { avisar: leerLocal('radar-avisar') === '1' });
+    document.querySelectorAll('#pasos li').forEach((p) => { p.className = 'hecho'; });
+    $('#informe').hidden = false;
+    $('#informe').innerHTML = `<span>📅 <b>${esc(informe.hoy)}</b></span><span><b>${informe.encontradasHoy ?? 0}</b> publicadas hoy</span><span><b>${informe.revisadas}</b> podés tomar desde ${esc(informe.ubicacion)}</span><span><b>${vacantes.length}</b> valen la pena</span>`;
+    $('#avisos').innerHTML = (informe.avisos || []).map((a) => `<div class="aviso">${esc(a)}</div>`).join('');
+    ponerBlips(vacantes.length);
+    if (!vacantes.length) {
+      $('#resultados').innerHTML = `<div class="vacio"><b>Hoy no apareció nada a tu altura todavía.</b><br>Las empresas publican durante todo el día: probá de nuevo más tarde.</div>`;
+    } else {
+      const falta = vacantes.length < (estado.ajustes?.minimo || 3) ? `<div class="aviso">Hoy solo ${vacantes.length === 1 ? 'hay 1 vacante' : `hay ${vacantes.length} vacantes`} que valen la pena. No rellené con publicaciones de otros días.</div>` : '';
+      $('#resultados').innerHTML = falta + vacantes.map(tarjeta).join('');
+    }
+  } catch (e) {
+    $('#avisos').innerHTML = `<div class="aviso error">No pude terminar la búsqueda: ${esc(e.message)}</div>`;
+    $('#pasos').hidden = true;
+  }
+  temporizadores.forEach(clearTimeout); temporizadores = [];
+  boton.disabled = false; boton.firstChild.textContent = 'BUSCAR NUEVO PROYECTO ';
+  $('#radar').classList.remove('buscando');
+};
+
+// Historial
+let filtro = 'todas';
+document.querySelectorAll('#filtros button').forEach((b) => b.onclick = () => {
+  filtro = b.dataset.estado;
+  document.querySelectorAll('#filtros button').forEach((x) => x.setAttribute('aria-pressed', x === b));
+  pintarHistorial();
+});
+async function cargarHistorial() { estado.historial = (await api('historial')).historial; pintarHistorial(); }
+function pintarHistorial() {
+  const lista = estado.historial.filter((v) => filtro === 'todas' || v.estado === filtro);
+  if (!lista.length) { $('#lista-historial').innerHTML = '<div class="vacio">Todavía no hay vacantes acá.</div>'; return; }
+  const porDia = {};
+  for (const v of lista) (porDia[(v.encontrada || '').slice(0, 10)] ||= []).push(v);
+  $('#lista-historial').innerHTML = Object.entries(porDia).map(([dia, vs]) => `<div class="dia mono">${esc(new Date(`${dia}T12:00:00`).toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }))}</div><div class="tarjetas">${vs.map(tarjeta).join('')}</div>`).join('');
+}
+
+// Inicio
+$('#fecha-hoy').textContent = new Date().toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
+api('ajustes').then(pintarEstado).catch((e) => { $('#avisos').innerHTML = `<div class="aviso error">${esc(e.message)}</div>`; });
+</script>
+</body>
+</html>
