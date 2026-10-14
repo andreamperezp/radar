@@ -1,27 +1,53 @@
 # Radar de vacantes
 
 Un buscador que trabaja al revés que un reclutador: en vez de buscar candidatas para una empresa, busca empresas para vos.
-Cada vez que tocás **BUSCAR NUEVO PROYECTO** (y solo una vez por día, a las 12:00 de Argentina):
+Solo muestra ofertas **publicadas hoy**, descarta las que no podés tomar desde tu ubicación y nunca te repite una vacante.
 
-1. Junta ofertas **publicadas hoy** en Get on Board, Himalayas y Remote OK.
-2. Claude busca en internet (LinkedIn, Computrabajo, Bumeran, ZonaJobs, Indeed, InfoJobs…) ofertas de hoy para la ubicación que elegiste. Solo las acepta si ve que se publicaron hoy.
-3. Descarta las que no podés tomar (por ejemplo "remoto solo EE. UU.").
-4. Claude lee cada una contra tu CV, le pone un puntaje y te explica por qué encaja y qué contar al postular.
-5. Te muestra las mejores (mínimo 3 si las hay; si hoy no hay tantas, te lo dice en vez de rellenar con vacantes viejas) y te avisa por Telegram.
+Tiene dos formas de buscar:
+
+| | Botón **BUSCAR NUEVO PROYECTO** (web) | **/radar** en Claude Code |
+|---|---|---|
+| Dónde busca | Get on Board, Himalayas, Remote OK | Lo mismo + LinkedIn, Computrabajo, Bumeran, ZonaJobs, Indeed, InfoJobs |
+| Cómo elige | Palabras clave | Claude lee cada oferta contra tu CV y te explica por qué encaja |
+| Costo | Gratis | Usa tu plan Pro de Claude, sin pagar nada extra |
+| Aviso a Telegram | No | Sí |
+
+Nada corre solo: el radar busca únicamente cuando se lo pedís.
+
+## Seguimiento de postulaciones
+
+Cuando tocás **Ya apliqué** en una vacante:
+- queda con el sello verde "✓ Aplicaste el…", en la web y en el historial;
+- si aparece otra vacante de la misma empresa, la ves marcada con "⚠️ Ya aplicaste en…" (también en Telegram);
+- pasa a la pestaña **Seguimiento**: un tablero Aplicada → Entrevista → Oferta / No quedó, con notas, días desde que
+  aplicaste (a los 10 días te sugiere escribirles) y métricas de cuántas te respondieron.
+
+## Usar /radar
+
+1. Una sola vez, creá el archivo `radar/.env.radar` (no se sube a GitHub) con tu clave de la web:
+   ```
+   APP_PASSWORD=la-misma-clave-que-cargaste-en-vercel
+   ```
+2. En Claude Code escribí `/radar`. Para una búsqueda puntual en otro lugar: `/radar Madrid, España`.
+
+El comando vive en `~/.claude/skills/radar/SKILL.md` (tu configuración personal de Claude Code) y usa `scripts/radar.mjs`
+para hablar con la web.
 
 ## Qué hay en cada archivo
 
 ```
-public/index.html     La web (botón, resultados, historial y ajustes)
-api/buscar.js         El botón BUSCAR NUEVO PROYECTO
-api/diario.js         La búsqueda automática diaria (Vercel Cron, ver vercel.json)
+public/index.html     La web: Hoy, Seguimiento, Historial y Ajustes
+api/buscar.js         Botón BUSCAR NUEVO PROYECTO (búsqueda rápida y gratis)
+api/candidatas.js     Le da a /radar las vacantes de hoy, tu perfil y lo que ya viste
+api/importar.js       Recibe lo que eligió /radar, lo guarda y avisa por Telegram
+api/historial.js      Historial, etapas de seguimiento y notas
 api/ajustes.js        Ubicación, modalidad y exigencia
-api/historial.js      Vacantes ya vistas y marcadas como aplicada / descartada
 api/telegram.js       Conectar tu chat y mandar una prueba
 lib/perfil.js         Tu CV resumido: si actualizás el CV, actualizá este texto
 lib/fuentes.js        Bolsas de empleo con fecha exacta
-lib/match.js          Búsqueda web y evaluación con Claude
-lib/ubicaciones.js    Lugares que podés elegir
+lib/match.js          Filtro de hoy y puntaje por palabras clave
+lib/almacen.js        Guardado (Vercel Blob) y marcas de "ya aplicaste"
+scripts/radar.mjs     Puente entre /radar y la web
 ```
 
 ## Probarlo en tu compu
@@ -31,27 +57,18 @@ npm install
 npm run dev
 ```
 
-Abrí http://localhost:5180. Sin `ANTHROPIC_API_KEY` funciona en "modo palabras clave" (solo bolsas de empleo).
-Los datos de prueba quedan en `.datos/`.
+Abrí http://localhost:5180. Los datos de prueba quedan en `.datos/`. Para probar `/radar` contra tu compu, agregá
+`RADAR_URL=http://localhost:5180` en `.env.radar`.
 
-## Publicarlo en Vercel (cuenta personal andreamperezp)
+## Vercel (cuenta personal andreamperezp)
 
-1. Subí la carpeta a un repo de GitHub e importalo en Vercel (Framework: **Other**, sin build).
-2. En **Storage → Create → Blob**, creá un store privado y conectalo al proyecto (agrega `BLOB_STORE_ID` solo).
-   Ya está hecho: el store se llama `radar-datos`.
-3. En **Settings → Environment Variables** cargá:
+Proyecto `radar`, conectado al repo `andreamperezp/radar`: cada cambio en `main` se publica solo.
+Almacenamiento: Blob privado `radar-datos`. Variables:
 
 | Variable | Qué es |
 |---|---|
-| `ANTHROPIC_API_KEY` | Tu clave de console.anthropic.com |
-| `APP_PASSWORD` | La clave que te va a pedir la web (inventala) |
-| `CRON_SECRET` | Un texto largo al azar; protege la búsqueda diaria |
+| `APP_PASSWORD` | La clave que te pide la web (y que usa `/radar`) |
 | `TELEGRAM_BOT_TOKEN` | El token que te da @BotFather |
+| `SITIO_URL`, `BLOB_*` | Ya cargadas; no tocar |
 
-4. Redeploy. Entrá a la web → **Ajustes** → **Conectar** Telegram.
-
-## Costo aproximado
-
-Cada búsqueda usa Claude Opus 5.5 con búsqueda web (hasta 10 búsquedas, a USD 10 cada 1.000) y lee bastantes páginas:
-calculá entre USD 0,20 y 0,40 por búsqueda. Con la diaria más algunas manuales, unos USD 8 a 15 por mes.
-Para gastar menos, bajá `max_uses` en `lib/match.js`.
+No hace falta `ANTHROPIC_API_KEY`: la parte con Claude corre en Claude Code con tu plan Pro.

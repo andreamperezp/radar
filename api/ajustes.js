@@ -16,6 +16,6 @@ export default async function handler(req, res) {
   res.json({
     ajustes,
     ubicaciones: UBICACIONES.map(({ id, nombre }) => ({ id, nombre })),
-    estado: { claude: Boolean(process.env.ANTHROPIC_API_KEY), telegram: hayTelegram(), telegramConectado: Boolean(ajustes.telegramChatId) },
+    estado: { telegram: hayTelegram(), telegramConectado: Boolean(ajustes.telegramChatId) },
   });
 }

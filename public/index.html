@@ -38,7 +38,7 @@ header.barra { display: flex; justify-content: space-between; align-items: cente
 .marca { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.02em; font-size: 18px; text-decoration: none; }
 .marca img { width: 32px; height: 32px; }
 .pestanas { display: flex; gap: 4px; background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 999px; padding: 4px; }
-.pestanas button { border: 0; background: none; color: var(--gris); padding: 6px 14px; border-radius: 999px; font-size: 14px; font-weight: 600; }
+.pestanas button { white-space: nowrap; border: 0; background: none; color: var(--gris); padding: 6px 14px; border-radius: 999px; font-size: 14px; font-weight: 600; }
 .pestanas button[aria-selected="true"] { background: var(--tinta); color: var(--fondo); }
 
 .portada { display: grid; grid-template-columns: 1.15fr .85fr; gap: 32px; align-items: center; margin: 48px 0 32px; }
@@ -131,6 +131,42 @@ input[type="range"] { width: 100%; accent-color: var(--coral-fuerte); }
 dialog { border: 0; border-radius: 18px; padding: 24px; width: min(420px, calc(100% - 32px)); background: var(--tarjeta); color: var(--tinta); box-shadow: 0 20px 60px rgba(0,0,0,.25); }
 dialog::backdrop { background: rgba(21,26,35,.45); }
 dialog h3 { margin: 0 0 6px; } dialog p { margin: 0 0 14px; color: var(--gris); font-size: 14px; }
+.nota-boton { font-size: 13px; color: var(--gris); margin: 10px 0 0; }
+.contador { font-size: 11px; background: var(--coral); color: #1E2430; border-radius: 999px; padding: 1px 7px; margin-left: 4px; }
+.a-fondo { display: flex; gap: 16px; align-items: center; background: var(--tarjeta); border: 1px solid var(--linea); border-left: 4px solid var(--menta); border-radius: 14px; padding: 16px 18px; margin: 0 0 18px; }
+.a-fondo p { margin: 6px 0 0; color: var(--tinta-suave); font-size: 15px; }
+.comando { border: 1px solid var(--linea); background: var(--fondo); color: var(--tinta); border-radius: 6px; padding: 1px 8px; font-size: 14px; font-weight: 700; }
+.comando.copiado::after { content: ' ✓ copiado'; color: var(--menta-fuerte); font-weight: 600; }
+
+/* Sellos sobre las tarjetas */
+.sello { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; border-radius: 8px; padding: 4px 10px; margin: 0 0 10px; }
+.sello.aplicada { background: color-mix(in srgb, var(--menta) 45%, var(--tarjeta)); color: var(--tinta); }
+.sello.empresa { background: color-mix(in srgb, var(--sol) 45%, var(--tarjeta)); color: var(--tinta); }
+.sello.claude { background: none; border: 1px solid var(--linea); color: var(--gris); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; padding: 2px 8px; }
+.vacante.en-seguimiento { border: 2px solid var(--menta); }
+.vacante.en-seguimiento .anillo { filter: grayscale(.6); opacity: .75; }
+
+/* Panel de seguimiento */
+.metricas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+.metrica { background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 14px; padding: 14px 16px; }
+.metrica b { display: block; font-size: 28px; letter-spacing: -.03em; line-height: 1.1; }
+.metrica span { font-size: 13px; color: var(--gris); }
+.tablero { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; align-items: start; }
+.columna { background: color-mix(in srgb, var(--linea) 35%, var(--fondo)); border-radius: 16px; padding: 12px; min-height: 120px; }
+.columna h3 { display: flex; justify-content: space-between; align-items: center; margin: 2px 4px 12px; font-size: 14px; }
+.columna h3 span { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--gris); }
+.columna h3::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--color); margin-right: 8px; }
+.columna h3 i { font-style: normal; flex: 1; }
+.postulacion { background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 12px; padding: 12px; margin-bottom: 10px; display: grid; gap: 8px; }
+.postulacion h4 { margin: 0; font-size: 15px; line-height: 1.3; }
+.postulacion .quien { font-size: 13px; color: var(--gris); }
+.postulacion .dias { font-size: 12px; color: var(--tinta-suave); }
+.postulacion .dias.frio { color: var(--coral-fuerte); }
+.postulacion select, .postulacion textarea { font: inherit; font-size: 13px; width: 100%; border: 1px solid var(--linea); border-radius: 8px; background: var(--fondo); color: var(--tinta); padding: 6px 8px; }
+.postulacion textarea { resize: vertical; min-height: 34px; }
+.postulacion a { font-size: 13px; font-weight: 700; }
+.columna .vacia { font-size: 13px; color: var(--gris); text-align: center; padding: 16px 4px; }
+
 footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: center; }
 
 @media (max-width: 760px) {
@@ -141,6 +177,9 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
   .boton-buscar { width: 100%; justify-content: center; }
   .pestanas button { padding: 6px 10px; }
   .marca span { display: none; }
+  .metricas { grid-template-columns: repeat(2, 1fr); }
+  .tablero { grid-template-columns: 1fr; }
+  .pestanas { padding: 3px; } .pestanas button { padding: 6px 8px; font-size: 13px; }
 }
 </style>
 </head>
@@ -150,6 +189,7 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
     <a class="marca" href="/"><img src="/favicon.svg" alt=""><span>radar <span class="mono" style="color:var(--coral-fuerte)">· ap.</span></span></a>
     <nav class="pestanas" role="tablist" aria-label="Secciones">
       <button role="tab" aria-selected="true" data-ir="hoy">Hoy</button>
+      <button role="tab" aria-selected="false" data-ir="seguimiento">Seguimiento <span class="contador mono" id="cont-seguimiento" hidden></span></button>
       <button role="tab" aria-selected="false" data-ir="historial">Historial</button>
       <button role="tab" aria-selected="false" data-ir="ajustes">Ajustes</button>
     </nav>
@@ -164,33 +204,50 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
         <p class="bajada">Al revés que un reclutador: el radar trabaja para vos. Busca ofertas publicadas hoy, las compara con tu CV y te dice por qué vale la pena postular.</p>
         <div class="chips">
           <span class="chip">📍 <span id="chip-ubicacion">…</span> <button data-ir="ajustes">cambiar</button></span>
-          <span class="chip"><span class="punto" id="punto-claude"></span><span id="txt-claude">Claude</span></span>
           <span class="chip"><span class="punto" id="punto-tg"></span><span id="txt-tg">Telegram</span></span>
         </div>
         <button class="boton-buscar" id="buscar">BUSCAR NUEVO PROYECTO <span class="flecha" aria-hidden="true">→</span></button>
+        <p class="nota-boton">Búsqueda rápida y gratis en Get on Board, Himalayas y Remote OK.</p>
         <ol class="pasos" id="pasos" hidden>
           <li>Revisando Get on Board, Himalayas y Remote OK</li>
-          <li>Claude busca en LinkedIn, Computrabajo, Bumeran y más</li>
           <li>Dejando solo lo publicado hoy y que podés tomar</li>
-          <li>Comparando cada vacante con tu CV</li>
+          <li>Ordenando por afinidad con tu perfil</li>
         </ol>
       </div>
       <div class="radar" id="radar" aria-hidden="true"><div class="barrido"></div><div class="centro"></div></div>
     </div>
 
+    <aside class="a-fondo">
+      <div>
+        <div class="kicker mono">Búsqueda a fondo · con Claude</div>
+        <p>Escribí <button class="comando mono" id="copiar-radar" title="Copiar">/radar</button> en Claude Code. Busca también en LinkedIn, Computrabajo y Bumeran, lee cada oferta contra tu CV y te la manda acá y a Telegram. Usa tu plan Pro, así que solo corre cuando se lo pedís.</p>
+      </div>
+    </aside>
+
     <div id="avisos"></div>
     <div class="informe" id="informe" hidden></div>
     <div class="tarjetas" id="resultados"></div>
+
+    <h2 id="titulo-de-hoy" hidden>Encontradas hoy</h2>
+    <div class="tarjetas" id="de-hoy"></div>
+  </section>
+
+  <!-- SEGUIMIENTO -->
+  <section id="seguimiento" hidden>
+    <h2>Seguimiento</h2>
+    <p class="sub">Tus postulaciones, etapa por etapa. Cambiá la etapa cuando te respondan y anotá lo importante.</p>
+    <div class="metricas" id="metricas"></div>
+    <div class="tablero" id="tablero"></div>
   </section>
 
   <!-- HISTORIAL -->
   <section id="historial" hidden>
     <h2>Historial</h2>
-    <p class="sub">Todo lo que el radar ya te mostró. Marcá dónde aplicaste para llevar la cuenta.</p>
+    <p class="sub">Todo lo que el radar ya te mostró. Las que marcaste como aplicadas tienen su sello, así no postulás dos veces.</p>
     <div class="filtros" id="filtros">
       <button aria-pressed="true" data-estado="todas">Todas</button>
-      <button aria-pressed="false" data-estado="nueva">Pendientes</button>
-      <button aria-pressed="false" data-estado="aplicada">Aplicadas</button>
+      <button aria-pressed="false" data-estado="nueva">Sin revisar</button>
+      <button aria-pressed="false" data-estado="seguimiento">Aplicadas</button>
       <button aria-pressed="false" data-estado="descartada">Descartadas</button>
     </div>
     <div id="lista-historial"></div>
@@ -233,7 +290,7 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
     </form>
 
     <h2>Avisos por Telegram</h2>
-    <p class="sub">Todos los días a las 12:00 (hora de Argentina) te llegan las vacantes del día al celular.</p>
+    <p class="sub">Cada vez que corrés <span class="mono">/radar</span>, las vacantes elegidas te llegan al celular.</p>
     <div class="panel">
       <ol class="pasos-tg">
         <li>En Telegram, hablale a <b>@BotFather</b>, mandá <code>/newbot</code> y elegí un nombre (por ejemplo "Radar de Andrea").</li>
@@ -243,9 +300,7 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
       </ol>
       <div class="opciones">
         <button class="boton" type="button" id="tg-conectar">Conectar</button>
-        <button class="boton claro" type="button" id="tg-probar">Mandar prueba</button>
-        <label><input type="checkbox" id="avisar-manual"> Avisarme también cuando busco a mano</label>
-      </div>
+        <button class="boton claro" type="button" id="tg-probar">Mandar prueba</button>      </div>
       <div id="tg-estado" class="sub" style="margin:0"></div>
     </div>
   </section>
@@ -303,14 +358,16 @@ function pedirClave(mensaje = '', falta = false) {
   });
 }
 
+
 // Pestañas
+const SECCIONES = ['hoy', 'seguimiento', 'historial', 'ajustes'];
 function ir(seccion) {
-  for (const id of ['hoy', 'historial', 'ajustes']) $(`#${id}`).hidden = id !== seccion;
+  for (const id of SECCIONES) $(`#${id}`).hidden = id !== seccion;
   document.querySelectorAll('.pestanas button').forEach((b) => b.setAttribute('aria-selected', b.dataset.ir === seccion));
-  if (seccion === 'historial') cargarHistorial();
+  pintarTodo();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-document.querySelectorAll('[data-ir]').forEach((b) => b.addEventListener('click', () => ir(b.dataset.ir)));
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-ir]'); if (b) ir(b.dataset.ir); });
 
 // Estado y ajustes
 function pintarEstado(datos) {
@@ -318,8 +375,6 @@ function pintarEstado(datos) {
   const a = datos.ajustes;
   const u = datos.ubicaciones.find((x) => x.id === a.ubicacion);
   $('#chip-ubicacion').textContent = a.ubicacion === 'otra' ? (a.ubicacionLibre || 'Otra') : (u?.nombre || a.ubicacion);
-  $('#punto-claude').className = `punto ${datos.estado.claude ? 'ok' : 'no'}`;
-  $('#txt-claude').textContent = datos.estado.claude ? 'Claude conectado' : 'Sin Claude (palabras clave)';
   const tg = datos.estado.telegram && datos.estado.telegramConectado;
   $('#punto-tg').className = `punto ${tg ? 'ok' : 'no'}`;
   $('#txt-tg').textContent = tg ? 'Telegram activo' : 'Telegram sin conectar';
@@ -350,8 +405,6 @@ $('#form-ajustes').onsubmit = async (e) => {
 };
 
 // Telegram
-$('#avisar-manual').checked = leerLocal('radar-avisar') === '1';
-$('#avisar-manual').onchange = (e) => guardarLocal('radar-avisar', e.target.checked ? '1' : '0');
 async function accionTelegram(accion, boton) {
   boton.disabled = true;
   try { await api('telegram', { accion }); $('#tg-estado').textContent = accion === 'conectar' ? '✓ Conectado. Revisá Telegram.' : '✓ Mensaje enviado.'; pintarEstado(await api('ajustes')); }
@@ -361,40 +414,86 @@ async function accionTelegram(accion, boton) {
 $('#tg-conectar').onclick = (e) => accionTelegram('conectar', e.target);
 $('#tg-probar').onclick = (e) => accionTelegram('probar', e.target);
 
+// /radar: copiar el comando
+$('#copiar-radar').onclick = async (e) => {
+  try { await navigator.clipboard.writeText('/radar'); e.target.classList.add('copiado'); setTimeout(() => e.target.classList.remove('copiado'), 1800); } catch {}
+};
+
+// Ayudas para el historial
+const SEGUIMIENTO = ['aplicada', 'entrevista', 'oferta', 'rechazada'];
+const ETAPAS = { aplicada: ['Aplicada', 'var(--menta)'], entrevista: ['Entrevista', 'var(--sol)'], oferta: ['Oferta', 'var(--menta-fuerte)'], rechazada: ['No quedó', 'var(--coral)'] };
+const normalizarUrl = (u = '') => u.split('?')[0].split('#')[0].replace(/\/$/, '').toLowerCase();
+const normalizarEmpresa = (n = '') => n.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+  .replace(/\b(inc|llc|ltd|s\.?a\.?|s\.?r\.?l\.?|sas|corp|co|gmbh)\b\.?/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+const fechaCorta = (iso) => (iso ? new Date(iso).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' }) : '');
+const diasDesde = (iso) => (iso ? Math.floor((Date.now() - new Date(iso)) / 86400000) : null);
+const hoyLocal = () => new Date().toLocaleDateString('en-CA');
+const registro = (v) => estado.historial.find((x) => normalizarUrl(x.url) === normalizarUrl(v.url));
+
+// Otra postulación tuya en la misma empresa (no esta misma vacante)
+function aplicadaEnEmpresa(v) {
+  const clave = normalizarEmpresa(v.empresa);
+  if (!clave) return null;
+  return estado.historial.find((x) => SEGUIMIENTO.includes(x.estado) && normalizarEmpresa(x.empresa) === clave && normalizarUrl(x.url) !== normalizarUrl(v.url));
+}
+
 // Tarjeta de vacante
 function colorPuntaje(p) { return p >= 85 ? 'var(--menta-fuerte)' : p >= 70 ? '#3FAF7A' : 'var(--coral)'; }
 function tarjeta(v, i = 0) {
-  const fecha = v.publicada ? new Date(v.publicada.length > 10 ? v.publicada : `${v.publicada}T12:00:00`).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) : '';
-  return `<article class="vacante ${v.estado || ''}" style="animation-delay:${i * 80}ms" data-url="${esc(v.url)}">
+  const r = registro(v) || v;
+  const etapa = r.estado || 'nueva';
+  const enSeguimiento = SEGUIMIENTO.includes(etapa);
+  const otra = aplicadaEnEmpresa(v);
+  // "publicada" puede ser una fecha ISO (bolsas) o un texto como "hace 3 horas" (búsqueda web).
+  const instante = v.publicada && v.publicada.length > 10 ? new Date(v.publicada) : null;
+  const hora = instante && !isNaN(instante) ? `publicada ${instante.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}`
+    : v.publicada && !/^\d{4}-\d{2}-\d{2}$/.test(v.publicada) ? `publicada ${v.publicada}` : 'publicada hoy';
+  const sellos = [
+    enSeguimiento ? `<div class="sello aplicada">✓ Aplicaste el ${esc(fechaCorta(r.aplicadaEl))} · ${esc(ETAPAS[etapa][0])}</div>` : '',
+    otra ? `<div class="sello empresa">⚠️ Ya aplicaste en ${esc(v.empresa)}: “${esc(otra.titulo)}” (${esc(fechaCorta(otra.aplicadaEl))})</div>` : '',
+  ].join('');
+  return `<article class="vacante ${enSeguimiento ? 'en-seguimiento' : etapa === 'descartada' ? 'descartada' : ''}" style="animation-delay:${i * 60}ms" data-url="${esc(v.url)}">
     <div class="anillo" style="--p:${v.puntaje};--color:${colorPuntaje(v.puntaje)}"><span>${v.puntaje}%</span></div>
     <div>
+      ${sellos}
       <h3>${esc(v.titulo)}</h3>
-      <div class="meta"><b>${esc(v.empresa)}</b><span>📍 ${esc(v.ubicacion)}</span><span>${esc(v.fuente)}${v.publicada && v.publicada.length > 10 ? ` · publicada ${fecha}` : ' · publicada hoy'}</span>${v.salario ? `<span>💰 ${esc(v.salario)}</span>` : ''}<span class="etiqueta">${v.idioma === 'en' ? 'inglés' : 'español'}</span></div>
+      <div class="meta"><b>${esc(v.empresa)}</b><span>📍 ${esc(v.ubicacion)}</span><span>${esc(v.fuente)} · ${esc(hora)}</span>${v.salario ? `<span>💰 ${esc(v.salario)}</span>` : ''}<span class="etiqueta">${v.idioma === 'en' ? 'inglés' : 'español'}</span>${v.modo === 'claude' ? '<span class="sello claude">analizada por Claude</span>' : ''}</div>
       <p class="porque">${esc(v.porQue)}</p>
       <p class="consejo">${esc(v.comoDestacar)}</p>
       <div class="acciones">
-        <a class="principal" href="${esc(v.url)}" target="_blank" rel="noopener">Ver y postular →</a>
-        <button data-estado="aplicada" aria-pressed="${v.estado === 'aplicada'}">Ya apliqué</button>
-        <button data-estado="descartada" aria-pressed="${v.estado === 'descartada'}">No me interesa</button>
+        <a class="principal" href="${esc(v.url)}" target="_blank" rel="noopener">${enSeguimiento ? 'Ver oferta' : 'Ver y postular →'}</a>
+        ${enSeguimiento
+          ? `<button data-ir="seguimiento">Ver en seguimiento</button><button data-estado="nueva">Deshacer</button>`
+          : `<button data-estado="aplicada">Ya apliqué</button><button data-estado="${etapa === 'descartada' ? 'nueva' : 'descartada'}" aria-pressed="${etapa === 'descartada'}">No me interesa</button>`}
       </div>
     </div>
   </article>`;
 }
-document.addEventListener('click', async (e) => {
+
+async function cambiarEtapa(url, etapa) {
+  estado.historial = (await api('historial', { url, estado: etapa })).historial;
+  pintarTodo();
+}
+document.addEventListener('click', (e) => {
   const b = e.target.closest('.vacante [data-estado]');
-  if (!b) return;
-  const art = b.closest('.vacante');
-  const nuevo = b.getAttribute('aria-pressed') === 'true' ? 'nueva' : b.dataset.estado;
-  art.querySelectorAll('[data-estado]').forEach((x) => x.setAttribute('aria-pressed', x.dataset.estado === nuevo));
-  art.classList.remove('aplicada', 'descartada'); if (nuevo !== 'nueva') art.classList.add(nuevo);
-  const { historial } = await api('historial', { url: art.dataset.url, estado: nuevo });
-  estado.historial = historial;
+  if (b) cambiarEtapa(b.closest('.vacante').dataset.url, b.dataset.estado);
 });
 
-// Radar: puntos que aparecen con cada resultado
+// HOY: lo encontrado hoy (búsqueda rápida y /radar)
+function pintarHoy() {
+  const deHoy = estado.historial
+    .filter((v) => v.encontrada && new Date(v.encontrada).toLocaleDateString('en-CA') === hoyLocal())
+    .sort((a, b) => (b.modo === 'claude') - (a.modo === 'claude') || b.puntaje - a.puntaje);
+  $('#titulo-de-hoy').hidden = !deHoy.length;
+  $('#titulo-de-hoy').textContent = `Encontradas hoy (${deHoy.length})`;
+  $('#de-hoy').innerHTML = deHoy.map(tarjeta).join('');
+  ponerBlips(deHoy.filter((v) => !SEGUIMIENTO.includes(v.estado) && v.estado !== 'descartada').length);
+}
+
+// Radar: puntos que aparecen con cada vacante pendiente
 function ponerBlips(n) {
   document.querySelectorAll('.blip').forEach((b) => b.remove());
-  for (let i = 0; i < n; i++) {
+  for (let i = 0; i < Math.min(n, 12); i++) {
     const ang = (i / Math.max(n, 1)) * Math.PI * 2 + 0.6, r = 18 + (i % 3) * 11;
     const b = document.createElement('div'); b.className = 'blip';
     b.style.left = `${50 + Math.cos(ang) * r}%`; b.style.top = `${50 + Math.sin(ang) * r}%`; b.style.animationDelay = `${i * 0.3}s`;
@@ -402,35 +501,31 @@ function ponerBlips(n) {
   }
 }
 
-// BUSCAR
+// BUSCAR (rápida y gratis)
 let temporizadores = [];
-function animarPasos(conClaude) {
+function animarPasos() {
   const pasos = [...document.querySelectorAll('#pasos li')];
   $('#pasos').hidden = false;
-  pasos.forEach((p) => { p.className = ''; });
-  pasos[1].hidden = !conClaude;
-  const visibles = pasos.filter((p) => !p.hidden);
-  const tiempos = conClaude ? [0, 12000, 55000, 75000] : [0, 9000, 18000];
-  visibles.forEach((p, i) => temporizadores.push(setTimeout(() => { visibles.forEach((x, j) => { x.className = j < i ? 'hecho' : j === i ? 'activo' : ''; }); }, tiempos[i])));
+  pasos.forEach((p, i) => temporizadores.push(setTimeout(() => { pasos.forEach((x, j) => { x.className = j < i ? 'hecho' : j === i ? 'activo' : ''; }); }, [0, 9000, 18000][i])));
 }
 $('#buscar').onclick = async () => {
   const boton = $('#buscar');
   boton.disabled = true; boton.firstChild.textContent = 'BUSCANDO… ';
   $('#radar').classList.add('buscando'); $('#avisos').innerHTML = ''; $('#informe').hidden = true; $('#resultados').innerHTML = '';
-  animarPasos($('#punto-claude').classList.contains('ok'));
+  animarPasos();
   try {
-    const { vacantes, informe } = await api('buscar', { avisar: leerLocal('radar-avisar') === '1' });
+    const { vacantes, informe } = await api('buscar', {});
     document.querySelectorAll('#pasos li').forEach((p) => { p.className = 'hecho'; });
     $('#informe').hidden = false;
-    $('#informe').innerHTML = `<span>📅 <b>${esc(informe.hoy)}</b></span><span><b>${informe.encontradasHoy ?? 0}</b> publicadas hoy</span><span><b>${informe.revisadas}</b> podés tomar desde ${esc(informe.ubicacion)}</span><span><b>${vacantes.length}</b> valen la pena</span>`;
+    $('#informe').innerHTML = `<span>📅 <b>${esc(informe.hoy)}</b></span><span><b>${informe.encontradasHoy ?? 0}</b> publicadas hoy</span><span><b>${informe.revisadas}</b> nuevas que podés tomar desde ${esc(informe.ubicacion)}</span><span><b>${vacantes.length}</b> valen la pena</span>`;
     $('#avisos').innerHTML = (informe.avisos || []).map((a) => `<div class="aviso">${esc(a)}</div>`).join('');
-    ponerBlips(vacantes.length);
     if (!vacantes.length) {
-      $('#resultados').innerHTML = `<div class="vacio"><b>Hoy no apareció nada a tu altura todavía.</b><br>Las empresas publican durante todo el día: probá de nuevo más tarde.</div>`;
-    } else {
-      const falta = vacantes.length < (estado.ajustes?.minimo || 3) ? `<div class="aviso">Hoy solo ${vacantes.length === 1 ? 'hay 1 vacante' : `hay ${vacantes.length} vacantes`} que valen la pena. No rellené con publicaciones de otros días.</div>` : '';
-      $('#resultados').innerHTML = falta + vacantes.map(tarjeta).join('');
+      $('#resultados').innerHTML = `<div class="vacio"><b>No apareció nada nuevo a tu altura.</b><br>Las empresas publican durante todo el día: probá más tarde, o corré <span class="mono">/radar</span> para buscar también en LinkedIn y Computrabajo.</div>`;
+    } else if (vacantes.length < (estado.ajustes?.minimo || 3)) {
+      $('#resultados').innerHTML = `<div class="aviso">Hoy solo ${vacantes.length === 1 ? 'hay 1 vacante nueva' : `hay ${vacantes.length} vacantes nuevas`} que valen la pena. No rellené con publicaciones de otros días.</div>`;
     }
+    estado.historial = (await api('historial')).historial;
+    pintarTodo();
   } catch (e) {
     $('#avisos').innerHTML = `<div class="aviso error">No pude terminar la búsqueda: ${esc(e.message)}</div>`;
     $('#pasos').hidden = true;
@@ -440,25 +535,83 @@ $('#buscar').onclick = async () => {
   $('#radar').classList.remove('buscando');
 };
 
-// Historial
+// SEGUIMIENTO: tablero por etapas
+function pintarSeguimiento() {
+  const lista = estado.historial.filter((v) => SEGUIMIENTO.includes(v.estado))
+    .sort((a, b) => new Date(b.aplicadaEl || 0) - new Date(a.aplicadaEl || 0));
+  const cuenta = (e) => lista.filter((v) => v.estado === e).length;
+  const respondieron = lista.filter((v) => v.estado !== 'aplicada').length;
+  const enCurso = cuenta('aplicada') + cuenta('entrevista');
+  $('#cont-seguimiento').hidden = !enCurso;
+  $('#cont-seguimiento').textContent = enCurso;
+  $('#metricas').innerHTML = [
+    [lista.length, 'postulaciones'],
+    [enCurso, 'en curso'],
+    [cuenta('entrevista') + cuenta('oferta'), 'entrevistas u ofertas'],
+    [lista.length ? `${Math.round((respondieron / lista.length) * 100)}%` : '—', 'te respondieron'],
+  ].map(([n, t]) => `<div class="metrica"><b>${n}</b><span>${t}</span></div>`).join('');
+
+  $('#tablero').innerHTML = SEGUIMIENTO.map((etapa) => {
+    const items = lista.filter((v) => v.estado === etapa);
+    return `<div class="columna" style="--color:${ETAPAS[etapa][1]}">
+      <h3><i>${ETAPAS[etapa][0]}</i><span>${items.length}</span></h3>
+      ${items.map((v) => {
+        const d = diasDesde(v.aplicadaEl);
+        const frio = etapa === 'aplicada' && d >= 10;
+        return `<div class="postulacion" data-url="${esc(v.url)}">
+          <h4>${esc(v.titulo)}</h4>
+          <div class="quien">${esc(v.empresa)} · ${esc(v.fuente)}</div>
+          <div class="dias ${frio ? 'frio' : ''}">Aplicaste el ${esc(fechaCorta(v.aplicadaEl))}${d !== null ? ` · hace ${d === 0 ? 'menos de un día' : d === 1 ? '1 día' : `${d} días`}` : ''}${frio ? ' · ¿mandás un mensaje de seguimiento?' : ''}</div>
+          <select aria-label="Etapa" data-cambiar-etapa>
+            ${SEGUIMIENTO.map((e) => `<option value="${e}" ${e === etapa ? 'selected' : ''}>${ETAPAS[e][0]}</option>`).join('')}
+            <option value="nueva">Quitar del seguimiento</option>
+          </select>
+          <textarea rows="2" placeholder="Nota: con quién hablaste, próximos pasos…" data-nota>${esc(v.nota || '')}</textarea>
+          <a href="${esc(v.url)}" target="_blank" rel="noopener">Ver oferta →</a>
+        </div>`;
+      }).join('') || '<div class="vacia">Nada por acá todavía.</div>'}
+    </div>`;
+  }).join('');
+}
+document.addEventListener('change', async (e) => {
+  const tarjeta = e.target.closest('.postulacion');
+  if (!tarjeta) return;
+  if (e.target.matches('[data-cambiar-etapa]')) cambiarEtapa(tarjeta.dataset.url, e.target.value);
+  if (e.target.matches('[data-nota]')) estado.historial = (await api('historial', { url: tarjeta.dataset.url, nota: e.target.value })).historial;
+});
+
+// HISTORIAL
 let filtro = 'todas';
 document.querySelectorAll('#filtros button').forEach((b) => b.onclick = () => {
   filtro = b.dataset.estado;
   document.querySelectorAll('#filtros button').forEach((x) => x.setAttribute('aria-pressed', x === b));
   pintarHistorial();
 });
-async function cargarHistorial() { estado.historial = (await api('historial')).historial; pintarHistorial(); }
 function pintarHistorial() {
-  const lista = estado.historial.filter((v) => filtro === 'todas' || v.estado === filtro);
+  const lista = estado.historial.filter((v) => filtro === 'todas' || (filtro === 'seguimiento' ? SEGUIMIENTO.includes(v.estado) : v.estado === filtro));
   if (!lista.length) { $('#lista-historial').innerHTML = '<div class="vacio">Todavía no hay vacantes acá.</div>'; return; }
   const porDia = {};
-  for (const v of lista) (porDia[(v.encontrada || '').slice(0, 10)] ||= []).push(v);
-  $('#lista-historial').innerHTML = Object.entries(porDia).map(([dia, vs]) => `<div class="dia mono">${esc(new Date(`${dia}T12:00:00`).toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }))}</div><div class="tarjetas">${vs.map(tarjeta).join('')}</div>`).join('');
+  for (const v of lista) (porDia[v.encontrada ? new Date(v.encontrada).toLocaleDateString('en-CA') : 'sin fecha'] ||= []).push(v);
+  $('#lista-historial').innerHTML = Object.entries(porDia).map(([dia, vs]) => `<div class="dia mono">${esc(dia === 'sin fecha' ? dia : new Date(`${dia}T12:00:00`).toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }))}</div><div class="tarjetas">${vs.map(tarjeta).join('')}</div>`).join('');
+}
+
+function pintarTodo() {
+  pintarHoy();
+  pintarSeguimiento();
+  if (!$('#historial').hidden) pintarHistorial();
 }
 
 // Inicio
 $('#fecha-hoy').textContent = new Date().toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
-api('ajustes').then(pintarEstado).catch((e) => { $('#avisos').innerHTML = `<div class="aviso error">${esc(e.message)}</div>`; });
+(async () => {
+  try {
+    pintarEstado(await api('ajustes'));
+    estado.historial = (await api('historial')).historial;
+    pintarTodo();
+  } catch (e) {
+    $('#avisos').innerHTML = `<div class="aviso error">${esc(e.message)}</div>`;
+  }
+})();
 </script>
 </body>
 </html>
