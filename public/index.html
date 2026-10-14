@@ -257,8 +257,9 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
   <form method="dialog" id="form-clave">
     <h3>Tu clave</h3>
     <p>El radar es solo tuyo. Escribí la clave que cargaste en Vercel como APP_PASSWORD.</p>
-    <input type="password" id="clave" autocomplete="current-password" required>
-    <div style="margin-top:14px"><button class="boton" value="ok">Entrar</button></div>
+    <input type="password" id="clave" autocomplete="current-password">
+    <div class="aviso error" id="error-clave" role="alert" hidden></div>
+    <div style="margin-top:14px"><button class="boton" id="entrar" value="ok">Entrar</button></div>
   </form>
 </dialog>
 
@@ -276,17 +277,29 @@ async function api(ruta, cuerpo) {
     headers: { 'Content-Type': 'application/json', 'x-clave': leerLocal('radar-clave') || '' },
     body: cuerpo ? JSON.stringify(cuerpo) : undefined,
   });
-  if (r.status === 401) { await pedirClave(); return api(ruta, cuerpo); }
   const datos = await r.json().catch(() => ({ error: `Error ${r.status}` }));
+  if (r.status === 401) {
+    const yaHabia = Boolean(leerLocal('radar-clave'));
+    await pedirClave(datos.falta ? datos.error : yaHabia ? datos.error : '', datos.falta);
+    return api(ruta, cuerpo);
+  }
   if (!r.ok) throw new Error(datos.error || `Error ${r.status}`);
   return datos;
 }
 
-function pedirClave() {
+function pedirClave(mensaje = '', falta = false) {
   return new Promise((ok) => {
     const d = $('#dialogo-clave');
-    d.showModal();
-    $('#form-clave').onsubmit = () => { guardarLocal('radar-clave', $('#clave').value); d.close(); ok(); };
+    $('#error-clave').textContent = mensaje;
+    $('#error-clave').hidden = !mensaje;
+    $('#clave').value = '';
+    $('#clave').disabled = falta;
+    $('#entrar').textContent = falta ? 'Reintentar' : 'Entrar';
+    if (!d.open) d.showModal();
+    $('#form-clave').onsubmit = () => {
+      if (!falta) guardarLocal('radar-clave', $('#clave').value);
+      ok();
+    };
   });
 }
 
