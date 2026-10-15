@@ -131,6 +131,8 @@ input[type="range"] { width: 100%; accent-color: var(--coral-fuerte); }
 dialog { border: 0; border-radius: 18px; padding: 24px; width: min(420px, calc(100% - 32px)); background: var(--tarjeta); color: var(--tinta); box-shadow: 0 20px 60px rgba(0,0,0,.25); }
 dialog::backdrop { background: rgba(21,26,35,.45); }
 dialog h3 { margin: 0 0 6px; } dialog p { margin: 0 0 14px; color: var(--gris); font-size: 14px; }
+.enlace { border: 0; background: none; padding: 0; color: var(--coral-fuerte); font-weight: 700; font-size: inherit; text-decoration: underline; }
+.vacante.saliendo { transition: opacity .3s ease, transform .3s ease; opacity: 0; transform: translateX(16px); }
 .nota-boton { font-size: 13px; color: var(--gris); margin: 10px 0 0; }
 .contador { font-size: 11px; background: var(--coral); color: #1E2430; border-radius: 999px; padding: 1px 7px; margin-left: 4px; }
 .a-fondo { display: flex; gap: 16px; align-items: center; background: var(--tarjeta); border: 1px solid var(--linea); border-left: 4px solid var(--menta); border-radius: 14px; padding: 16px 18px; margin: 0 0 18px; }
@@ -228,7 +230,8 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
     <div class="informe" id="informe" hidden></div>
     <div class="tarjetas" id="resultados"></div>
 
-    <h2 id="titulo-de-hoy" hidden>Encontradas hoy</h2>
+    <h2 id="titulo-de-hoy" hidden>Para aplicar hoy</h2>
+    <div class="informe" id="resumen-de-hoy" hidden></div>
     <div class="tarjetas" id="de-hoy"></div>
   </section>
 
@@ -474,9 +477,16 @@ async function cambiarEtapa(url, etapa) {
   estado.historial = (await api('historial', { url, estado: etapa })).historial;
   pintarTodo();
 }
-document.addEventListener('click', (e) => {
+document.addEventListener('click', async (e) => {
   const b = e.target.closest('.vacante [data-estado]');
-  if (b) cambiarEtapa(b.closest('.vacante').dataset.url, b.dataset.estado);
+  if (!b) return;
+  const art = b.closest('.vacante');
+  // En "Para aplicar hoy" la tarjeta se va con una animación antes de pasar a su lista.
+  if (art.closest('#de-hoy') && b.dataset.estado !== 'nueva') {
+    art.classList.add('saliendo');
+    await new Promise((r) => setTimeout(r, 300));
+  }
+  cambiarEtapa(art.dataset.url, b.dataset.estado);
 });
 
 // HOY: lo encontrado hoy (búsqueda rápida y /radar)
@@ -484,10 +494,22 @@ function pintarHoy() {
   const deHoy = estado.historial
     .filter((v) => v.encontrada && new Date(v.encontrada).toLocaleDateString('en-CA') === hoyLocal())
     .sort((a, b) => (b.modo === 'claude') - (a.modo === 'claude') || b.puntaje - a.puntaje);
+  // Acá quedan solo las que te faltan aplicar; las aplicadas pasan a Seguimiento y las descartadas al Historial.
+  const pendientes = deHoy.filter((v) => !SEGUIMIENTO.includes(v.estado) && v.estado !== 'descartada');
+  const aplicadas = deHoy.filter((v) => SEGUIMIENTO.includes(v.estado)).length;
+  const descartadas = deHoy.filter((v) => v.estado === 'descartada').length;
   $('#titulo-de-hoy').hidden = !deHoy.length;
-  $('#titulo-de-hoy').textContent = `Encontradas hoy (${deHoy.length})`;
-  $('#de-hoy').innerHTML = deHoy.map(tarjeta).join('');
-  ponerBlips(deHoy.filter((v) => !SEGUIMIENTO.includes(v.estado) && v.estado !== 'descartada').length);
+  $('#titulo-de-hoy').textContent = `Para aplicar hoy (${pendientes.length})`;
+  const resumen = [
+    aplicadas ? `<span>✓ Aplicaste a <b>${aplicadas}</b> de hoy · <button class="enlace" data-ir="seguimiento">ver en Seguimiento</button></span>` : '',
+    descartadas ? `<span>Descartaste <b>${descartadas}</b> · <button class="enlace" data-ir="historial">ver en Historial</button></span>` : '',
+  ].join('');
+  $('#resumen-de-hoy').innerHTML = resumen;
+  $('#resumen-de-hoy').hidden = !resumen;
+  $('#de-hoy').innerHTML = pendientes.length
+    ? pendientes.map(tarjeta).join('')
+    : deHoy.length ? '<div class="vacio"><b>¡Al día!</b> Ya revisaste todas las vacantes de hoy.</div>' : '';
+  ponerBlips(pendientes.length);
 }
 
 // Radar: puntos que aparecen con cada vacante pendiente
