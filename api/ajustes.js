@@ -16,6 +16,6 @@ export default async function handler(req, res) {
   res.json({
     ajustes,
     ubicaciones: UBICACIONES.map(({ id, nombre }) => ({ id, nombre })),
-    estado: { telegram: hayTelegram(), telegramConectado: Boolean(ajustes.telegramChatId) },
+    estado: { telegram: hayTelegram(), telegramConectado: Boolean(ajustes.telegramChatId), correoRevisado: ajustes.correoRevisado || null },
   });
 }

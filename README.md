@@ -22,6 +22,24 @@ Cuando tocás **Ya apliqué** en una vacante:
 - pasa a la pestaña **Seguimiento**: un tablero Aplicada → Entrevista → Oferta / No quedó, con notas, días desde que
   aplicaste (a los 10 días te sugiere escribirles) y métricas de cuántas te respondieron.
 
+## Gmail: seguimiento automático de respuestas
+
+`apps-script/RadarGmail.gs` corre gratis en tu cuenta de Google (Apps Script) y cada 10 minutos le pasa a la web los
+mails nuevos sobre postulaciones. Solo lee: no borra ni responde nada. La web (`api/correo.js` + `lib/correo.js`) decide:
+
+| Mail | Qué pasa |
+|---|---|
+| "Gracias por postularte" / "recibimos tu CV" | Queda anotado en la tarjeta (📩). Sin aviso. |
+| Invitación a entrevista, agenda, Calendly, prueba técnica | Aviso por Telegram y la tarjeta pasa a **Entrevista** |
+| Oferta | Aviso por Telegram y la tarjeta pasa a **Oferta** |
+| "Lamentablemente…" | La tarjeta pasa a **No quedó**, sin aviso |
+
+Une cada mail con tu postulación por el nombre de la empresa (remitente, dominio o asunto). Si una entrevista llega
+desde una plataforma de selección (Greenhouse, Lever, Workable…) y no encuentra la empresa, igual te avisa.
+Las tarjetas nunca retroceden de etapa por un mail. Para ajustar las reglas, se edita `lib/correo.js` y se publica.
+
+Instalación: Ajustes → Gmail en la web tiene el paso a paso. Para apagarlo, ejecutá `desinstalar` en el script.
+
 ## Usar /radar
 
 1. Una sola vez, creá el archivo `radar/.env.radar` (no se sube a GitHub) con tu clave de la web:

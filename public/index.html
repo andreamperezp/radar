@@ -177,6 +177,12 @@ dialog h3 { margin: 0 0 6px; } dialog p { margin: 0 0 14px; color: var(--gris); 
 .columna.sobre { background: color-mix(in srgb, var(--color) 22%, var(--fondo)); outline-color: var(--color); }
 .zona-quitar { display: none; grid-column: 1 / -1; text-align: center; font-size: 14px; font-weight: 600; color: var(--gris); border: 2px dashed var(--linea); border-radius: 14px; padding: 16px; }
 .arrastrando .zona-quitar { display: block; position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 40; max-width: 948px; margin: 0 auto; background: var(--tarjeta); box-shadow: var(--sombra); }
+.mails { list-style: none; margin: 0; padding: 8px 0 0; border-top: 1px dashed var(--linea); display: grid; gap: 4px; }
+.mail { display: grid; grid-template-columns: 18px 1fr auto; gap: 6px; align-items: center; font-size: 12px; }
+.mail a { font-weight: 600; font-size: 12px; text-decoration: none; color: var(--tinta-suave); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mail a:hover { text-decoration: underline; }
+.mail.avance a, .mail.oferta a { color: var(--tinta); font-weight: 800; }
+.mail time { color: var(--gris); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
 .zona-quitar.sobre { border-color: var(--coral); color: var(--coral-fuerte); background: color-mix(in srgb, var(--coral) 12%, var(--fondo)); }
 .columna .vacia { font-size: 13px; color: var(--gris); text-align: center; padding: 16px 4px; }
 
@@ -317,6 +323,18 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
         <button class="boton claro" type="button" id="tg-probar">Mandar prueba</button>      </div>
       <div id="tg-estado" class="sub" style="margin:0"></div>
     </div>
+
+    <h2>Gmail</h2>
+    <p class="sub">Un script en tu cuenta de Google revisa cada 10 minutos los mails de tus postulaciones. "Gracias por postularte" queda anotado; una entrevista o una oferta te llega a Telegram y mueve la tarjeta sola.</p>
+    <div class="panel">
+      <div class="opciones"><span class="chip"><span class="punto" id="punto-gmail"></span><span id="txt-gmail">Gmail</span></span></div>
+      <ol class="pasos-tg">
+        <li>Entrá a <a href="https://script.google.com/home/projects/create" target="_blank" rel="noopener">script.google.com</a> con andreamperezp31@gmail.com (se abre un proyecto nuevo).</li>
+        <li>Borrá lo que aparece y pegá el código de <code>apps-script/RadarGmail.gs</code>.</li>
+        <li>En el engranaje <b>Configuración del proyecto → Propiedades del script</b>, agregá <code>RADAR_URL</code> = <code>https://radar-eight-topaz.vercel.app</code> y <code>APP_PASSWORD</code> = tu clave.</li>
+        <li>Arriba elegí la función <b>instalar</b> y tocá <b>Ejecutar</b>. Aceptá el permiso de Google.</li>
+      </ol>
+    </div>
   </section>
 
   <footer>Hecho para Andrea Pérez · <a href="https://andreaperez.dev">andreaperez.dev</a></footer>
@@ -392,6 +410,12 @@ function pintarEstado(datos) {
   const tg = datos.estado.telegram && datos.estado.telegramConectado;
   $('#punto-tg').className = `punto ${tg ? 'ok' : 'no'}`;
   $('#txt-tg').textContent = tg ? 'Telegram activo' : 'Telegram sin conectar';
+  const revisado = datos.estado.correoRevisado ? new Date(datos.estado.correoRevisado) : null;
+  const minutos = revisado ? Math.round((Date.now() - revisado) / 60000) : null;
+  $('#punto-gmail').className = `punto ${revisado && minutos < 40 ? 'ok' : 'no'}`;
+  $('#txt-gmail').textContent = !revisado ? 'Gmail sin conectar'
+    : minutos < 40 ? `Gmail conectado · revisó hace ${minutos < 1 ? 'menos de un minuto' : `${minutos} min`}`
+    : `Gmail no revisa desde el ${revisado.toLocaleString('es-AR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`;
   $('#tg-estado').textContent = !datos.estado.telegram ? 'Falta cargar TELEGRAM_BOT_TOKEN en Vercel.' : (datos.estado.telegramConectado ? '✓ Tu chat está conectado.' : 'Bot listo: falta conectar tu chat.');
 
   $('#ubicacion').innerHTML = datos.ubicaciones.map((x) => `<option value="${x.id}">${esc(x.nombre)}</option>`).join('');
@@ -436,6 +460,7 @@ $('#copiar-radar').onclick = async (e) => {
 // Ayudas para el historial
 const SEGUIMIENTO = ['aplicada', 'entrevista', 'oferta', 'rechazada'];
 const ETAPAS = { aplicada: ['Aplicada', 'var(--menta)'], entrevista: ['Entrevista', 'var(--sol)'], oferta: ['Oferta', 'var(--menta-fuerte)'], rechazada: ['No quedó', 'var(--coral)'] };
+const MAILS = { recibido: ['📩', 'Recibieron tu postulación'], avance: ['📅', 'Te invitaron a avanzar'], oferta: ['🎉', 'Te hicieron una oferta'], rechazo: ['💌', 'Respondieron que no'] };
 const normalizarUrl = (u = '') => u.split('?')[0].split('#')[0].replace(/\/$/, '').toLowerCase();
 const normalizarEmpresa = (n = '') => n.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
   .replace(/\b(inc|llc|ltd|s\.?a\.?|s\.?r\.?l\.?|sas|corp|co|gmbh)\b\.?/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
@@ -595,6 +620,7 @@ function pintarSeguimiento() {
           <h4>${esc(v.titulo)}</h4>
           <div class="quien">${esc(v.empresa)} · ${esc(v.fuente)}</div>
           <div class="dias ${frio ? 'frio' : ''}">Aplicaste el ${esc(fechaCorta(v.aplicadaEl))}${d !== null ? ` · hace ${d === 0 ? 'menos de un día' : d === 1 ? '1 día' : `${d} días`}` : ''}${frio ? ' · ¿les escribís?' : ''}</div>
+          ${(v.correos || []).length ? `<ul class="mails">${v.correos.slice(0, 3).map((c) => `<li class="mail ${c.tipo}"><span>${MAILS[c.tipo]?.[0] || '✉️'}</span><a href="${esc(c.enlace)}" target="_blank" rel="noopener" title="${esc(c.asunto)}">${esc(MAILS[c.tipo]?.[1] || c.asunto)}</a><time>${esc(fechaCorta(c.fecha))}</time></li>`).join('')}</ul>` : ''}
           <a href="${esc(v.url)}" target="_blank" rel="noopener">Ver oferta →</a>
         </div>`;
       }).join('') || '<div class="vacia">Soltá una tarjeta acá.</div>'}
