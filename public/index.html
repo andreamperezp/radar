@@ -164,9 +164,20 @@ dialog h3 { margin: 0 0 6px; } dialog p { margin: 0 0 14px; color: var(--gris); 
 .postulacion .quien { font-size: 13px; color: var(--gris); }
 .postulacion .dias { font-size: 12px; color: var(--tinta-suave); }
 .postulacion .dias.frio { color: var(--coral-fuerte); }
-.postulacion select, .postulacion textarea { font: inherit; font-size: 13px; width: 100%; border: 1px solid var(--linea); border-radius: 8px; background: var(--fondo); color: var(--tinta); padding: 6px 8px; }
-.postulacion textarea { resize: vertical; min-height: 34px; }
-.postulacion a { font-size: 13px; font-weight: 700; }
+.postulacion a { font-size: 13px; font-weight: 700; justify-self: start; }
+
+/* Arrastrar y soltar */
+.postulacion { cursor: grab; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; transition: opacity .15s ease, box-shadow .15s ease, transform .15s ease; }
+.postulacion:hover { box-shadow: var(--sombra); }
+.postulacion.por-levantar { transform: scale(.98); }
+.postulacion.levantada { opacity: .3; }
+.fantasma { position: fixed; left: 0; top: 0; z-index: 50; pointer-events: none; cursor: grabbing; box-shadow: 0 18px 40px rgba(0,0,0,.3); margin: 0; }
+.arrastrando, .arrastrando * { cursor: grabbing !important; }
+.columna { transition: background .15s ease, outline-color .15s ease; outline: 2px dashed transparent; outline-offset: -2px; }
+.columna.sobre { background: color-mix(in srgb, var(--color) 22%, var(--fondo)); outline-color: var(--color); }
+.zona-quitar { display: none; grid-column: 1 / -1; text-align: center; font-size: 14px; font-weight: 600; color: var(--gris); border: 2px dashed var(--linea); border-radius: 14px; padding: 16px; }
+.arrastrando .zona-quitar { display: block; position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 40; max-width: 948px; margin: 0 auto; background: var(--tarjeta); box-shadow: var(--sombra); }
+.zona-quitar.sobre { border-color: var(--coral); color: var(--coral-fuerte); background: color-mix(in srgb, var(--coral) 12%, var(--fondo)); }
 .columna .vacia { font-size: 13px; color: var(--gris); text-align: center; padding: 16px 4px; }
 
 footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: center; }
@@ -238,7 +249,7 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
   <!-- SEGUIMIENTO -->
   <section id="seguimiento" hidden>
     <h2>Seguimiento</h2>
-    <p class="sub">Tus postulaciones, etapa por etapa. Cambiá la etapa cuando te respondan y anotá lo importante.</p>
+    <p class="sub">Tus postulaciones, etapa por etapa. Arrastrá cada tarjeta a su etapa cuando te respondan (en el celular, mantenela apretada un instante).</p>
     <div class="metricas" id="metricas"></div>
     <div class="tablero" id="tablero"></div>
   </section>
@@ -575,32 +586,113 @@ function pintarSeguimiento() {
 
   $('#tablero').innerHTML = SEGUIMIENTO.map((etapa) => {
     const items = lista.filter((v) => v.estado === etapa);
-    return `<div class="columna" style="--color:${ETAPAS[etapa][1]}">
+    return `<div class="columna" data-etapa="${etapa}" style="--color:${ETAPAS[etapa][1]}">
       <h3><i>${ETAPAS[etapa][0]}</i><span>${items.length}</span></h3>
       ${items.map((v) => {
         const d = diasDesde(v.aplicadaEl);
         const frio = etapa === 'aplicada' && d >= 10;
-        return `<div class="postulacion" data-url="${esc(v.url)}">
+        return `<div class="postulacion" data-url="${esc(v.url)}" data-etapa="${etapa}" tabindex="0" aria-label="${esc(v.titulo)}, ${esc(v.empresa)}. Arrastrala a otra etapa.">
           <h4>${esc(v.titulo)}</h4>
           <div class="quien">${esc(v.empresa)} · ${esc(v.fuente)}</div>
-          <div class="dias ${frio ? 'frio' : ''}">Aplicaste el ${esc(fechaCorta(v.aplicadaEl))}${d !== null ? ` · hace ${d === 0 ? 'menos de un día' : d === 1 ? '1 día' : `${d} días`}` : ''}${frio ? ' · ¿mandás un mensaje de seguimiento?' : ''}</div>
-          <select aria-label="Etapa" data-cambiar-etapa>
-            ${SEGUIMIENTO.map((e) => `<option value="${e}" ${e === etapa ? 'selected' : ''}>${ETAPAS[e][0]}</option>`).join('')}
-            <option value="nueva">Quitar del seguimiento</option>
-          </select>
-          <textarea rows="2" placeholder="Nota: con quién hablaste, próximos pasos…" data-nota>${esc(v.nota || '')}</textarea>
+          <div class="dias ${frio ? 'frio' : ''}">Aplicaste el ${esc(fechaCorta(v.aplicadaEl))}${d !== null ? ` · hace ${d === 0 ? 'menos de un día' : d === 1 ? '1 día' : `${d} días`}` : ''}${frio ? ' · ¿les escribís?' : ''}</div>
           <a href="${esc(v.url)}" target="_blank" rel="noopener">Ver oferta →</a>
         </div>`;
-      }).join('') || '<div class="vacia">Nada por acá todavía.</div>'}
+      }).join('') || '<div class="vacia">Soltá una tarjeta acá.</div>'}
     </div>`;
-  }).join('');
+  }).join('') + '<div class="zona-quitar" data-etapa="nueva">Soltá acá para quitarla del seguimiento</div>';
 }
-document.addEventListener('change', async (e) => {
+
+// Arrastrar tarjetas entre etapas (mouse y dedo). En el celular se mantiene apretada un instante para levantarla.
+let arrastre = null;
+function soltarSobre(x, y) {
+  const bajo = document.elementFromPoint(x, y);
+  return bajo ? bajo.closest('.columna[data-etapa], .zona-quitar') : null;
+}
+function moverFantasma(x, y) {
+  arrastre.fantasma.style.transform = `translate(${x - arrastre.dx}px, ${y - arrastre.dy}px) rotate(2deg)`;
+  const destino = soltarSobre(x, y);
+  document.querySelectorAll('.sobre').forEach((c) => c !== destino && c.classList.remove('sobre'));
+  if (destino && destino.dataset.etapa !== arrastre.desde) destino.classList.add('sobre');
+}
+function empezarArrastre(e) {
+  const r = arrastre.tarjeta.getBoundingClientRect();
+  arrastre.dx = e.clientX - r.left; arrastre.dy = e.clientY - r.top;
+  arrastre.fantasma = arrastre.tarjeta.cloneNode(true);
+  arrastre.fantasma.classList.add('fantasma');
+  arrastre.fantasma.style.width = `${r.width}px`;
+  document.body.appendChild(arrastre.fantasma);
+  arrastre.tarjeta.classList.add('levantada');
+  $('#tablero').classList.add('arrastrando');
+  arrastre.activo = true;
+  arrastre.ultimo = { x: e.clientX, y: e.clientY };
+  moverFantasma(e.clientX, e.clientY);
+  // Si la tarjeta se acerca al borde de la pantalla, la página se desplaza sola
+  arrastre.desplazar = setInterval(() => {
+    if (!arrastre) return;
+    const { x, y } = arrastre.ultimo, borde = 90;
+    const paso = y < borde ? -14 : y > innerHeight - borde - 70 ? 14 : 0;
+    if (paso) { window.scrollBy(0, paso); moverFantasma(x, y); }
+  }, 16);
+}
+function terminarArrastre() {
+  if (!arrastre) return;
+  clearTimeout(arrastre.espera);
+  clearInterval(arrastre.desplazar);
+  arrastre.fantasma?.remove();
+  arrastre.tarjeta.classList.remove('levantada', 'por-levantar');
+  $('#tablero').classList.remove('arrastrando');
+  document.querySelectorAll('.sobre').forEach((c) => c.classList.remove('sobre'));
+  arrastre = null;
+}
+$('#tablero').addEventListener('pointerdown', (e) => {
   const tarjeta = e.target.closest('.postulacion');
-  if (!tarjeta) return;
-  if (e.target.matches('[data-cambiar-etapa]')) cambiarEtapa(tarjeta.dataset.url, e.target.value);
-  if (e.target.matches('[data-nota]')) estado.historial = (await api('historial', { url: tarjeta.dataset.url, nota: e.target.value })).historial;
+  if (!tarjeta || e.target.closest('a') || e.button > 0) return;
+  arrastre = { tarjeta, desde: tarjeta.dataset.etapa, x: e.clientX, y: e.clientY, tactil: e.pointerType !== 'mouse', activo: false };
+  if (arrastre.tactil) {
+    tarjeta.classList.add('por-levantar');
+    arrastre.espera = setTimeout(() => { if (arrastre) { navigator.vibrate?.(15); empezarArrastre(e); } }, 280);
+  }
 });
+document.addEventListener('pointermove', (e) => {
+  if (!arrastre) return;
+  if (!arrastre.activo) {
+    const lejos = Math.hypot(e.clientX - arrastre.x, e.clientY - arrastre.y) > 6;
+    if (lejos && arrastre.tactil) return terminarArrastre(); // en el celular, mover antes de tiempo es hacer scroll
+    if (lejos) empezarArrastre(e);
+    return;
+  }
+  e.preventDefault();
+  arrastre.ultimo = { x: e.clientX, y: e.clientY };
+  moverFantasma(e.clientX, e.clientY);
+}, { passive: false });
+document.addEventListener('pointerup', (e) => {
+  if (!arrastre) return;
+  const { activo, desde, tarjeta } = arrastre;
+  const destino = activo ? soltarSobre(e.clientX, e.clientY) : null;
+  terminarArrastre();
+  if (destino && destino.dataset.etapa !== desde) moverA(tarjeta.dataset.url, destino.dataset.etapa);
+});
+document.addEventListener('pointercancel', terminarArrastre);
+// Mientras se arrastra con el dedo, que la página no se desplace
+document.addEventListener('touchmove', (e) => { if (arrastre?.activo) e.preventDefault(); }, { passive: false });
+
+// Se mueve al instante y se guarda en segundo plano; si falla, vuelve a como estaba.
+async function moverA(url, etapa) {
+  const v = estado.historial.find((x) => normalizarUrl(x.url) === normalizarUrl(url));
+  if (!v) return;
+  const antes = { ...v };
+  v.estado = etapa;
+  if (etapa === 'nueva') delete v.aplicadaEl;
+  pintarTodo();
+  try {
+    estado.historial = (await api('historial', { url, estado: etapa })).historial;
+    pintarTodo();
+  } catch (err) {
+    Object.assign(v, antes);
+    pintarTodo();
+    $('#avisos').innerHTML = `<div class="aviso error">No pude mover la tarjeta: ${esc(err.message)}</div>`;
+  }
+}
 
 // HISTORIAL
 let filtro = 'todas';
