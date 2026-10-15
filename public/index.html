@@ -325,7 +325,7 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
     </div>
 
     <h2>Gmail</h2>
-    <p class="sub">Un script en tu cuenta de Google revisa cada 10 minutos los mails de tus postulaciones. "Gracias por postularte" queda anotado; una entrevista o una oferta te llega a Telegram y mueve la tarjeta sola.</p>
+    <p class="sub">Un script en tu cuenta de Google revisa cada 3 horas los mails de tus postulaciones (no usa tu plan de Claude). "Gracias por postularte" queda anotado; una entrevista o una oferta te llega a Telegram y mueve la tarjeta sola, y al terminar cada revisión te llega "✅ Revisión completada".</p>
     <div class="panel">
       <div class="opciones"><span class="chip"><span class="punto" id="punto-gmail"></span><span id="txt-gmail">Gmail</span></span></div>
       <ol class="pasos-tg">
@@ -412,9 +412,9 @@ function pintarEstado(datos) {
   $('#txt-tg').textContent = tg ? 'Telegram activo' : 'Telegram sin conectar';
   const revisado = datos.estado.correoRevisado ? new Date(datos.estado.correoRevisado) : null;
   const minutos = revisado ? Math.round((Date.now() - revisado) / 60000) : null;
-  $('#punto-gmail').className = `punto ${revisado && minutos < 40 ? 'ok' : 'no'}`;
+  $('#punto-gmail').className = `punto ${revisado && minutos < 210 ? "ok" : "no"}`;
   $('#txt-gmail').textContent = !revisado ? 'Gmail sin conectar'
-    : minutos < 40 ? `Gmail conectado · revisó hace ${minutos < 1 ? 'menos de un minuto' : `${minutos} min`}`
+    : minutos < 210 ? `Gmail conectado · revisó hace ${minutos < 1 ? "menos de un minuto" : minutos < 60 ? `${minutos} min` : `${Math.floor(minutos / 60)} h ${minutos % 60} min`}`
     : `Gmail no revisa desde el ${revisado.toLocaleString('es-AR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`;
   $('#tg-estado').textContent = !datos.estado.telegram ? 'Falta cargar TELEGRAM_BOT_TOKEN en Vercel.' : (datos.estado.telegramConectado ? '✓ Tu chat está conectado.' : 'Bot listo: falta conectar tu chat.');
 

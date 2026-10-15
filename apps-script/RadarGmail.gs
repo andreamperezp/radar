@@ -1,8 +1,10 @@
 /**
  * Radar · Gmail
- * Cada 10 minutos revisa tus mails nuevos sobre postulaciones y se los pasa a tu radar.
+ * Cada 3 horas revisa tus mails nuevos sobre postulaciones y se los pasa a tu radar.
  * El radar decide si es "gracias por postularte", una entrevista, una oferta o un rechazo,
- * actualiza tu Seguimiento y te avisa por Telegram solo cuando avanzás.
+ * actualiza tu Seguimiento, te avisa por Telegram cuando avanzás y al final te manda
+ * "✅ Revisión completada" con el resumen.
+ * No usa Claude: no consume nada de tu plan.
  *
  * Este script solo LEE mails: no borra, no responde ni mueve nada en tu Gmail.
  *
@@ -21,12 +23,23 @@ var PALABRAS = [
   'lamentablemente', 'unfortunately', 'calendly', 'desafío', 'challenge', 'assessment', '"thank you for your interest"'
 ];
 
+// Cada cuántas horas revisar. Google solo deja programar cada 1, 2, 4, 6, 8 o 12 horas,
+// así que el script se despierta cada hora y revisa solo cuando pasaron estas horas.
+var CADA_HORAS = 3;
+
 function instalar() {
-  // Borra programaciones anteriores de este script y crea una cada 10 minutos.
+  // Borra programaciones anteriores de este script y crea una que se despierta cada hora.
   ScriptApp.getProjectTriggers().forEach(function (t) { ScriptApp.deleteTrigger(t); });
-  ScriptApp.newTrigger('revisar').timeBased().everyMinutes(10).create();
+  ScriptApp.newTrigger('cadaHora').timeBased().everyHours(1).create();
   revisar();
-  Logger.log('Listo: el radar va a revisar tu Gmail cada 10 minutos.');
+  Logger.log('Listo: el radar va a revisar tu Gmail cada ' + CADA_HORAS + ' horas y te avisa por Telegram al terminar.');
+}
+
+// La llama Google cada hora: revisa solo si ya pasaron CADA_HORAS desde la última vez.
+function cadaHora() {
+  var ultima = Number(PropertiesService.getScriptProperties().getProperty('ULTIMA_REVISION')) || 0;
+  var margen = 10 * 60 * 1000; // 10 minutos de tolerancia, porque Google no es exacto con la hora
+  if (Date.now() - ultima >= CADA_HORAS * 3600 * 1000 - margen) revisar();
 }
 
 function desinstalar() {
@@ -69,7 +82,7 @@ function revisar() {
     method: 'post',
     contentType: 'application/json',
     headers: { 'x-clave': clave },
-    payload: JSON.stringify({ correos: correos }),
+    payload: JSON.stringify({ correos: correos, resumen: true, cadaHoras: CADA_HORAS }),
     muteHttpExceptions: true
   });
   if (respuesta.getResponseCode() !== 200) {

@@ -24,7 +24,7 @@ Cuando tocás **Ya apliqué** en una vacante:
 
 ## Gmail: seguimiento automático de respuestas
 
-`apps-script/RadarGmail.gs` corre gratis en tu cuenta de Google (Apps Script) y cada 10 minutos le pasa a la web los
+`apps-script/RadarGmail.gs` corre gratis en tu cuenta de Google (Apps Script) y cada 3 horas le pasa a la web los
 mails nuevos sobre postulaciones. Solo lee: no borra ni responde nada. La web (`api/correo.js` + `lib/correo.js`) decide:
 
 | Mail | Qué pasa |

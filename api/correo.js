@@ -29,6 +29,23 @@ function avisoTelegram(tipo, correo, v, sitio) {
   ].filter(Boolean).join('\n');
 }
 
+const hora = (d) => d.toLocaleTimeString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', hour: '2-digit', minute: '2-digit' });
+
+function resumenDeRevision(resultado, cadaHoras) {
+  const cuenta = (t) => resultado.filter((r) => r.tipo === t).length;
+  const partes = [
+    cuenta('oferta') && `🎉 ${cuenta('oferta')} oferta${cuenta('oferta') > 1 ? 's' : ''}`,
+    cuenta('avance') && `📅 ${cuenta('avance')} para avanzar`,
+    cuenta('recibido') && `📩 ${cuenta('recibido') > 1 ? `${cuenta('recibido')} postulaciones recibidas` : '1 postulación recibida'}`,
+    cuenta('rechazo') && `💌 ${cuenta('rechazo')} no quedó`,
+  ].filter(Boolean);
+  const ahora = new Date();
+  const proxima = cadaHoras ? ` Próxima revisión: ${hora(new Date(ahora.getTime() + cadaHoras * 3600 * 1000))}` : '';
+  return partes.length
+    ? `✅ <b>Revisión de Gmail completada</b> · ${hora(ahora)}\n${partes.join(' · ')}${cuenta('avance') || cuenta('oferta') ? '\n(Los detalles te llegaron en el mensaje anterior.)' : ''}\n${proxima.trim()}`
+    : `✅ <b>Revisión de Gmail completada</b> · ${hora(ahora)}\nSin novedades de tus postulaciones.${proxima}`;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
   if (!autorizado(req)) return pedirClave(res);
@@ -80,5 +97,16 @@ export default async function handler(req, res) {
   if (huboCambios) await guardarHistorial(historial);
   await guardarDato('correos', procesados.slice(0, 500));
   await guardarAjustes({ correoRevisado: new Date().toISOString() });
-  res.json({ procesados: resultado.length, resultado });
+
+  // Al final de cada revisión, un resumen corto a Telegram (aunque no haya novedades).
+  let resumen = null;
+  if (req.body.resumen && hayTelegram() && ajustes.telegramChatId) {
+    try {
+      await enviar(ajustes.telegramChatId, resumenDeRevision(resultado, Number(req.body.cadaHoras) || null));
+      resumen = 'enviado';
+    } catch (e) {
+      resumen = `error: ${e.message}`;
+    }
+  }
+  res.json({ procesados: resultado.length, resultado, resumen });
 }
