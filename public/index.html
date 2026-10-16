@@ -142,6 +142,64 @@ input[type="range"] { width: 100%; accent-color: var(--coral-fuerte); }
 dialog { border: 0; border-radius: 18px; padding: 24px; width: min(420px, calc(100% - 32px)); background: var(--tarjeta); color: var(--tinta); box-shadow: 0 20px 60px rgba(0,0,0,.25); }
 dialog::backdrop { background: rgba(21,26,35,.45); }
 dialog h3 { margin: 0 0 6px; } dialog p { margin: 0 0 14px; color: var(--gris); font-size: 14px; }
+/* Pantalla de carga: nada se muestra hasta saber quién entró */
+.pantalla-carga { position: fixed; inset: 0; display: none; place-items: center; align-content: center; gap: 14px; background: var(--fondo); z-index: 60; color: var(--gris); font-size: 14px; }
+.preparando .pantalla-carga { display: grid; }
+.preparando .envoltura { visibility: hidden; }
+.radar-mini { width: 96px; max-width: 96px; }
+.radar-mini .barrido { animation-duration: 1.4s; }
+
+/* Bienvenida guiada */
+.flujo { max-width: 680px; margin: 24px auto 0; }
+.flujo-cabeza { display: grid; gap: 8px; margin-bottom: 28px; }
+.flujo-cuenta { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--gris); }
+.flujo-barra { height: 6px; border-radius: 999px; background: var(--linea); overflow: hidden; }
+.flujo-barra div { height: 100%; width: 0; background: linear-gradient(90deg, var(--menta), var(--coral)); border-radius: inherit; transition: width .4s ease; }
+.flujo-paso { animation: entrar .35s ease both; }
+.flujo-titulo { font-size: clamp(30px, 5.5vw, 46px); line-height: 1.08; letter-spacing: -.035em; margin: 10px 0 14px; font-weight: 800; }
+h2.flujo-titulo { font-size: clamp(26px, 4.5vw, 36px); }
+.saludo { display: inline-block; animation: saludar 1.6s ease .4s 2; transform-origin: 70% 70%; }
+@keyframes saludar { 0%, 100% { transform: rotate(0); } 20%, 60% { transform: rotate(16deg); } 40%, 80% { transform: rotate(-8deg); } }
+.flujo-texto { font-size: 18px; color: var(--tinta-suave); margin: 0 0 16px; max-width: 58ch; }
+.flujo-texto.suave { font-size: 16px; color: var(--gris); }
+.flujo-sub { font-size: 16px; margin: 26px 0 10px; }
+.flujo-ayuda { font-size: 13px; color: var(--gris); margin: 10px 0 0; }
+.flujo-lista { list-style: none; padding: 0; margin: 22px 0; display: grid; gap: 10px; }
+.flujo-lista li { display: flex; gap: 14px; align-items: center; background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 14px; padding: 14px 16px; }
+.flujo-lista li > span { font-size: 24px; }
+.flujo-lista small { display: block; color: var(--gris); font-size: 14px; }
+.flujo-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-top: 26px; }
+.flujo-acciones .sub { margin: 0; }
+.boton.grande { padding: 14px 24px; font-size: 16px; border-radius: 12px; }
+.boton:disabled:not([data-estado]) { opacity: .45; }
+.soltar-cv.grande { flex-direction: column; text-align: center; padding: 36px 20px; gap: 10px; font-size: 16px; }
+.soltar-cv.grande .soltar-icono { font-size: 44px; }
+.sugerencias { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.sugerencias button { border: 1px dashed var(--linea); background: none; color: var(--tinta-suave); border-radius: 999px; padding: 5px 12px; font-size: 13px; font-weight: 600; }
+.sugerencias button:hover { border-color: var(--coral); color: var(--tinta); }
+.sugerencias button::before { content: '+ '; color: var(--coral-fuerte); }
+.opciones-grandes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.opciones-grandes button { text-align: left; border: 1px solid var(--linea); background: var(--tarjeta); color: var(--tinta); border-radius: 12px; padding: 12px 14px; display: grid; gap: 2px; transition: border-color .15s ease, background .15s ease; }
+.opciones-grandes button small { color: var(--gris); font-size: 12px; }
+.opciones-grandes button:hover { border-color: var(--tinta-suave); }
+.opciones-grandes button[aria-checked="true"] { border: 2px solid var(--coral); background: color-mix(in srgb, var(--coral) 10%, var(--tarjeta)); }
+.flujo-numeros { padding-left: 22px; display: grid; gap: 8px; color: var(--tinta-suave); margin: 0 0 18px; }
+.flujo-fin-icono { font-size: 56px; animation: confirmado .6s ease; }
+.flujo-resumen { list-style: none; padding: 0; margin: 0 0 20px; display: grid; gap: 8px; }
+.flujo-resumen li { display: grid; grid-template-columns: 120px 1fr; gap: 12px; background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 12px; padding: 12px 14px; font-size: 14px; }
+.flujo-resumen li span:first-child { color: var(--gris); font-weight: 700; }
+.flujo-resumen li.falta span:last-child { color: var(--coral-fuerte); }
+.flujo-siguiente { border-left: 4px solid var(--menta); background: var(--tarjeta); border-radius: 12px; padding: 14px 18px; }
+.flujo-siguiente h3 { margin: 0 0 4px; font-size: 16px; }
+.flujo-siguiente p { margin: 0; color: var(--tinta-suave); }
+.en-flujo .pestanas, .en-flujo footer { display: none !important; }
+@media (max-width: 760px) {
+  .opciones-grandes { grid-template-columns: 1fr 1fr; }
+  .flujo-texto { font-size: 16px; }
+  .flujo-resumen li { grid-template-columns: 1fr; gap: 2px; }
+  .flujo-acciones .boton.grande { flex: 1; }
+}
+
 /* Perfil y bienvenida */
 input[type="url"], textarea { width: 100%; font: inherit; padding: 11px 12px; border: 1px solid var(--linea); border-radius: 10px; background: var(--fondo); color: var(--tinta); }
 textarea { resize: vertical; line-height: 1.5; }
@@ -262,7 +320,11 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
 }
 </style>
 </head>
-<body>
+<body class="preparando">
+<div class="pantalla-carga" id="pantalla-carga" role="status" aria-live="polite">
+  <div class="radar radar-mini" aria-hidden="true"><div class="barrido"></div><div class="centro"></div></div>
+  <p>Preparando tu radar…</p>
+</div>
 <div class="envoltura">
   <header class="barra">
     <a class="marca" href="/"><img src="/favicon.svg" alt=""><span>radar <span class="mono" style="color:var(--coral-fuerte)" id="iniciales">·</span></span></a>
@@ -274,6 +336,145 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
       <button role="tab" aria-selected="false" data-ir="ajustes">Ajustes <span class="contador mono" id="cont-pedidos" hidden></span></button>
     </nav>
   </header>
+
+  <!-- BIENVENIDA GUIADA (primera vez de un invitado) -->
+  <section id="flujo" class="flujo" hidden aria-label="Armá tu radar">
+    <div class="flujo-cabeza" id="flujo-cabeza" hidden>
+      <span class="mono flujo-cuenta" id="flujo-cuenta">Paso 1 de 5</span>
+      <div class="flujo-barra" role="progressbar" aria-valuemin="0" aria-valuemax="5" aria-valuenow="1" id="flujo-barra"><div id="flujo-progreso"></div></div>
+    </div>
+
+    <!-- 0 · Bienvenida -->
+    <div class="flujo-paso" data-paso="0">
+      <div class="kicker mono">Bienvenido a Radar</div>
+      <h1 class="flujo-titulo">¡Hola, <span data-nombre>vos</span>! <span class="saludo" aria-hidden="true">👋</span></h1>
+      <p class="flujo-texto">Si estás acá es porque <b data-duena>Andrea</b> te dio este acceso para que consigas vacantes acordes a tu perfil. ¡Así que vamos por ellas!</p>
+      <p class="flujo-texto suave">Radar trabaja al revés que un reclutador: en vez de buscar candidatos para una empresa, busca empresas para vos. Todos los días encuentra ofertas publicadas <b>ese mismo día</b>, las lee contra tu CV y te dice por qué valen la pena.</p>
+      <ul class="flujo-lista">
+        <li><span>📄</span><div><b>Tu CV y lo que buscás</b><small>Es contra lo que vamos a comparar cada vacante.</small></div></li>
+        <li><span>📍</span><div><b>Dónde querés trabajar</b><small>Remoto, híbrido o presencial, y en qué lugar.</small></div></li>
+        <li><span>📲</span><div><b>Tu Telegram</b><small>Para que las vacantes te lleguen al celular.</small></div></li>
+      </ul>
+      <div class="flujo-acciones">
+        <button class="boton grande" type="button" data-flujo-seguir>Empezar →</button>
+        <span class="sub">Te lleva unos 3 minutos. Se guarda a medida que avanzás.</span>
+      </div>
+    </div>
+
+    <!-- 1 · CV -->
+    <div class="flujo-paso" data-paso="1" hidden>
+      <div class="kicker mono">Tu CV</div>
+      <h2 class="flujo-titulo">Empecemos por lo más importante: tu CV.</h2>
+      <p class="flujo-texto">Claude lo va a leer para entender tu experiencia, tus proyectos y tus herramientas. Con eso compara cada vacante con vos y te explica por qué encaja.</p>
+      <label class="soltar-cv grande" id="f-soltar" for="f-cv">
+        <input type="file" id="f-cv" accept="application/pdf,.pdf" hidden>
+        <span class="soltar-icono" aria-hidden="true">📄</span>
+        <span id="f-cv-texto"><b>Elegí tu CV</b> o arrastralo acá<br><small>PDF de hasta 3 MB</small></span>
+      </label>
+      <p class="flujo-ayuda">¿Tu CV está en Word o en Google Docs? Exportalo como PDF: <i>Archivo → Descargar → PDF</i>.</p>
+      <div class="flujo-acciones">
+        <button class="boton claro" type="button" data-flujo-atras>← Atrás</button>
+        <button class="boton grande" type="button" data-flujo-seguir id="f-seguir-cv" disabled>Seguir →</button>
+        <button class="enlace" type="button" id="f-sin-cv">No tengo el CV a mano, uso mi LinkedIn</button>
+      </div>
+    </div>
+
+    <!-- 2 · Qué busca -->
+    <div class="flujo-paso" data-paso="2" hidden>
+      <div class="kicker mono">Lo que buscás</div>
+      <h2 class="flujo-titulo">¿Qué puestos te interesan?</h2>
+      <p class="flujo-texto">Sumá los nombres de puesto que buscarías en LinkedIn. Cuanto más concretos, mejor: "Diseñador UX/UI" funciona mejor que "diseño".</p>
+      <div class="chips-puestos" id="f-chips"></div>
+      <input type="text" id="f-puesto" placeholder="Escribí un puesto y apretá Enter" autocomplete="off">
+      <div class="sugerencias" id="f-sugerencias"></div>
+      <h3 class="flujo-sub">¿Cómo es tu inglés?</h3>
+      <div class="opciones-grandes" id="f-ingles" role="radiogroup" aria-label="Nivel de inglés">
+        <button type="button" role="radio" aria-checked="false" data-ingles="basico"><b>Básico</b><small>Leo algo, me cuesta hablar</small></button>
+        <button type="button" role="radio" aria-checked="false" data-ingles="intermedio"><b>Intermedio</b><small>Me defiendo en reuniones</small></button>
+        <button type="button" role="radio" aria-checked="false" data-ingles="avanzado"><b>Avanzado</b><small>Trabajo en inglés sin problema</small></button>
+        <button type="button" role="radio" aria-checked="false" data-ingles="nativo"><b>Nativo</b><small>O bilingüe</small></button>
+      </div>
+      <div class="flujo-acciones">
+        <button class="boton claro" type="button" data-flujo-atras>← Atrás</button>
+        <button class="boton grande" type="button" data-flujo-seguir id="f-seguir-puestos" disabled>Seguir →</button>
+        <span class="sub" id="f-falta-puestos"></span>
+      </div>
+    </div>
+
+    <!-- 3 · Links y contexto -->
+    <div class="flujo-paso" data-paso="3" hidden>
+      <div class="kicker mono">Tus links</div>
+      <h2 class="flujo-titulo">Mostrale al radar tu trabajo.</h2>
+      <p class="flujo-texto">Claude también mira tu portfolio o tu web para conocer lo que hacés. Si alguno no lo tenés, dejalo vacío.</p>
+      <div class="campo"><label for="f-linkedin">LinkedIn <span class="opcional" id="f-linkedin-nota">(opcional)</span></label><input type="url" id="f-linkedin" inputmode="url" placeholder="linkedin.com/in/tu-usuario"></div>
+      <div class="fila"><div class="campo"><label for="f-portfolio">Portfolio <span class="opcional">(opcional)</span></label><input type="url" id="f-portfolio" inputmode="url" placeholder="behance.net/… o tu sitio"></div>
+      <div class="campo"><label for="f-web">Otra web <span class="opcional">(opcional)</span></label><input type="url" id="f-web" inputmode="url" placeholder="GitHub, blog, un proyecto…"></div></div>
+      <div class="campo"><label for="f-contexto">Contanos lo que no dice tu CV <span class="opcional">(opcional, pero ayuda mucho)</span></label>
+        <textarea id="f-contexto" rows="4" maxlength="2000" placeholder="Qué tipo de empresa te gusta, qué no querés hacer, si buscás freelance o relación de dependencia, desde cuándo podés empezar, salario esperado…"></textarea></div>
+      <div class="flujo-acciones">
+        <button class="boton claro" type="button" data-flujo-atras>← Atrás</button>
+        <button class="boton grande" type="button" data-flujo-seguir id="f-seguir-links">Seguir →</button>
+        <span class="sub" id="f-falta-links"></span>
+      </div>
+    </div>
+
+    <!-- 4 · Dónde -->
+    <div class="flujo-paso" data-paso="4" hidden>
+      <div class="kicker mono">Dónde</div>
+      <h2 class="flujo-titulo">¿Dónde querés trabajar?</h2>
+      <p class="flujo-texto">Solo te vamos a mostrar vacantes que puedas tomar desde ahí. "Hoy" se calcula con la hora de ese lugar.</p>
+      <div class="campo"><label for="f-ubicacion">Lugar</label><select id="f-ubicacion"></select>
+        <input type="text" id="f-ubicacion-libre" placeholder="Ej.: Córdoba, Argentina · Montevideo · remoto en México" style="margin-top:8px" hidden></div>
+      <h3 class="flujo-sub">Modalidad</h3>
+      <div class="opciones">
+        <label><input type="checkbox" name="f-modalidad" value="remoto" checked> Remoto</label>
+        <label><input type="checkbox" name="f-modalidad" value="hibrido" checked> Híbrido</label>
+        <label><input type="checkbox" name="f-modalidad" value="presencial"> Presencial</label>
+      </div>
+      <div class="flujo-acciones">
+        <button class="boton claro" type="button" data-flujo-atras>← Atrás</button>
+        <button class="boton grande" type="button" data-flujo-seguir id="f-seguir-donde">Seguir →</button>
+      </div>
+    </div>
+
+    <!-- 5 · Telegram -->
+    <div class="flujo-paso" data-paso="5" hidden>
+      <div class="kicker mono">Tu Telegram</div>
+      <h2 class="flujo-titulo">Recibí tus vacantes en el celular.</h2>
+      <p class="flujo-texto">Cuando Claude te encuentre vacantes, te llegan por Telegram con el link para postular. Si no usás Telegram, las ves igual acá en tu radar.</p>
+      <ol class="flujo-numeros">
+        <li><b>Tocá "Abrir Telegram".</b> Se abre el bot del radar con un código que es solo tuyo.</li>
+        <li><b>En Telegram tocá "Iniciar"</b> (o <i>Start</i>).</li>
+        <li><b>Volvé acá y tocá "Conectar".</b> Te llega un saludo para confirmar.</li>
+      </ol>
+      <div class="opciones">
+        <button class="boton claro" type="button" id="f-tg-abrir">Abrir Telegram ↗</button>
+        <button class="boton" type="button" id="f-tg-conectar">Conectar</button>
+      </div>
+      <p class="sub" id="f-tg-estado"></p>
+      <div class="flujo-acciones">
+        <button class="boton claro" type="button" data-flujo-atras>← Atrás</button>
+        <button class="boton grande" type="button" data-flujo-seguir id="f-seguir-tg">Terminar →</button>
+        <button class="enlace" type="button" data-flujo-seguir>Lo hago después</button>
+      </div>
+    </div>
+
+    <!-- 6 · Listo -->
+    <div class="flujo-paso" data-paso="6" hidden>
+      <div class="flujo-fin-icono" aria-hidden="true">🎯</div>
+      <h1 class="flujo-titulo">¡Listo, <span data-nombre>vos</span>! Tu radar está armado.</h1>
+      <p class="flujo-texto">Esto es lo que el radar sabe de vos. Lo podés cambiar cuando quieras en <b>Perfil</b> y <b>Ajustes</b>.</p>
+      <ul class="flujo-resumen" id="f-resumen"></ul>
+      <div class="flujo-siguiente">
+        <h3>¿Qué sigue?</h3>
+        <p>Pedí tu primera <b>búsqueda a fondo</b>: Claude busca en LinkedIn, Computrabajo y más, lee cada oferta contra tu CV y te manda las que valen la pena. La corre <b data-duena>Andrea</b>, así que puede tardar un poco: te avisamos por Telegram.</p>
+      </div>
+      <div class="flujo-acciones">
+        <button class="boton grande" type="button" id="f-pedir">Pedir mi primera búsqueda a fondo</button>
+        <button class="boton claro" type="button" id="f-ir-radar">Ir a mi radar</button>
+      </div>
+    </div>
+  </section>
 
   <!-- HOY -->
   <section id="hoy">
@@ -346,18 +547,8 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
     <div id="lista-historial"></div>
   </section>
 
-  <!-- PERFIL (también es la bienvenida la primera vez) -->
+  <!-- PERFIL -->
   <section id="perfil" hidden>
-    <div id="bienvenida" class="bienvenida" hidden>
-      <div class="kicker mono">Bienvenida al radar</div>
-      <h1 id="titulo-bienvenida">¡Hola! Contale al radar quién sos.</h1>
-      <p class="bajada">Este radar trabaja al revés que un reclutador: busca empresas para vos. Para eso necesita conocerte. Con tu CV y tus links, Claude arma tu perfil y te busca vacantes publicadas el mismo día que encajen con vos.</p>
-      <ol class="pasitos">
-        <li class="activo">Tu perfil</li>
-        <li>Dónde querés trabajar</li>
-        <li>Tu Telegram</li>
-      </ol>
-    </div>
     <div id="encabezado-perfil">
       <h2>Tu perfil</h2>
       <p class="sub">Lo que el radar sabe de vos para buscarte trabajo. Si cambiás el CV, Claude lo vuelve a leer en la próxima búsqueda a fondo.</p>
@@ -417,7 +608,6 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
 
   <!-- AJUSTES -->
   <section id="ajustes" hidden>
-    <div class="aviso" id="aviso-onboarding" hidden>¡Perfil guardado! 🎉 Ahora contale al radar <b>dónde querés trabajar</b> y conectá tu <b>Telegram</b> para recibir las vacantes en el celular.</div>
     <h2>Ajustes</h2>
     <p class="sub">El botón de búsqueda rápida y <span class="mono">/radar</span> usan estos ajustes.</p>
     <form class="panel" id="form-ajustes">
@@ -539,6 +729,7 @@ async function api(ruta, cuerpo) {
 }
 
 function pedirClave(mensaje = '', falta = false) {
+  document.body.classList.remove('preparando');
   return new Promise((ok) => {
     const d = $('#dialogo-clave');
     $('#error-clave').textContent = mensaje;
@@ -558,6 +749,8 @@ function pedirClave(mensaje = '', falta = false) {
 // Pestañas
 const SECCIONES = ['hoy', 'seguimiento', 'historial', 'perfil', 'ajustes'];
 function ir(seccion) {
+  $('#flujo').hidden = true;
+  document.body.classList.remove('en-flujo');
   for (const id of SECCIONES) $(`#${id}`).hidden = id !== seccion;
   document.querySelectorAll('.pestanas button').forEach((b) => b.setAttribute('aria-selected', b.dataset.ir === seccion));
   if (seccion === 'perfil') cargarPerfil();
@@ -747,7 +940,8 @@ function pintarHoy() {
   $('#resumen-de-hoy').hidden = !resumen;
   $('#de-hoy').innerHTML = pendientes.length
     ? pendientes.map(tarjeta).join('')
-    : deHoy.length ? '<div class="vacio"><b>¡Al día!</b> Ya revisaste todas las vacantes de hoy.</div>' : '';
+    : deHoy.length ? '<div class="vacio"><b>¡Al día!</b> Ya revisaste todas las vacantes de hoy.</div>'
+    : !estado.quien?.admin && !estado.historial.length ? `<div class="vacio bienvenida-vacia"><b>Tu radar está listo, ${esc(primerNombre(estado.quien?.nombre))}.</b><br>Todavía no hay vacantes para vos. Tocá <b>Buscar nuevo proyecto</b> para una búsqueda rápida ahora, o pedí una <b>búsqueda a fondo</b> para que Claude las compare con tu CV.</div>` : '';
   ponerBlips(pendientes.length);
 }
 
@@ -958,6 +1152,7 @@ function pintarQuien() {
   $('#bloque-personas').hidden = !q.admin;
   $('#bloque-gmail').hidden = !q.admin;
   document.title = q.admin ? 'Radar de vacantes' : `Radar de ${primerNombre(nombre)}`;
+  $('#fecha-hoy').textContent = new Date().toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }) + (q.admin ? '' : ` · Hola, ${primerNombre(nombre)}`);
   pintarPedido();
 }
 
@@ -1066,7 +1261,6 @@ $('#form-perfil').onsubmit = async (e) => {
   e.preventDefault();
   if ($('#p-puestos').value.trim()) { sumarPuestos($('#p-puestos').value); $('#p-puestos').value = ''; }
   if (revisarFaltantes().length) { $('#perfil-falta').classList.add('alerta'); return; }
-  const eraBienvenida = !$('#bienvenida').hidden;
   const r = await conRespuesta($('#guardar-perfil'), { cargando: cvNuevo ? 'Subiendo CV…' : 'Guardando…', ok: '✓ Perfil guardado', error: 'No se pudo guardar' }, async () => {
     const res = await api('perfil', {
       nombre: $('#p-nombre').value, ingles: $('#p-ingles').value, puestos,
@@ -1078,29 +1272,201 @@ $('#form-perfil').onsubmit = async (e) => {
   });
   if (!r?.ok) { $('#perfil-falta').textContent = r?.detalle || ''; return; }
   pintarEstado(await api('ajustes'));
-  if (eraBienvenida) setTimeout(terminarBienvenida, 900);
-  else setTimeout(cargarPerfil, 900);
+  setTimeout(cargarPerfil, 900);
 };
 
-// ── Primera vez de un invitado: perfil → dónde trabajar → Telegram ──────────
-function empezarBienvenida() {
-  $('#navegacion').hidden = true;
-  $('#bienvenida').hidden = false;
-  $('#encabezado-perfil').hidden = true;
-  $('#titulo-bienvenida').textContent = `¡Hola${estado.quien?.nombre ? `, ${primerNombre(estado.quien.nombre)}` : ''}! Contale al radar quién sos.`;
-  $('#guardar-perfil').textContent = 'Guardar y seguir →';
-  ir('perfil');
+// ── Bienvenida guiada: la primera vez de cada invitado ──────────────────────
+const DUENA = 'Andrea';
+const SUGERENCIAS = ['Diseñador UX/UI', 'Product Designer', 'Diseñador Gráfico', 'Frontend Developer', 'Desarrollador Full Stack', 'Project Manager', 'Product Manager', 'Analista de Datos', 'Marketing Digital', 'Community Manager', 'QA Tester', 'Atención al Cliente'];
+const flujo = { paso: 0, puestos: [], ingles: '', cv: null, sinCv: false };
+const TOTAL_PASOS = 5;
+
+function mostrarPaso(n) {
+  flujo.paso = n;
+  document.querySelectorAll('.flujo-paso').forEach((p) => { p.hidden = Number(p.dataset.paso) !== n; });
+  const enCamino = n >= 1 && n <= TOTAL_PASOS;
+  $('#flujo-cabeza').hidden = !enCamino;
+  $('#flujo-cuenta').textContent = `Paso ${n} de ${TOTAL_PASOS}`;
+  $('#flujo-progreso').style.width = `${Math.round(((enCamino ? n : n > TOTAL_PASOS ? TOTAL_PASOS : 0) / TOTAL_PASOS) * 100)}%`;
+  $('#flujo-barra').setAttribute('aria-valuenow', String(n));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  const titulo = document.querySelector(`.flujo-paso[data-paso="${n}"] .flujo-titulo`);
+  titulo?.setAttribute('tabindex', '-1'); titulo?.focus({ preventScroll: true });
+  if (n === 2) pintarPuestosFlujo();
+  if (n === 3) revisarLinks();
+  if (n === 6) pintarResumen();
 }
-function terminarBienvenida() {
-  $('#navegacion').hidden = false;
-  $('#bienvenida').hidden = true;
-  $('#encabezado-perfil').hidden = false;
-  $('#guardar-perfil').dataset.original = 'Guardar perfil';
-  $('#guardar-perfil').textContent = 'Guardar perfil';
-  $('#aviso-onboarding').hidden = false;
-  ir('ajustes');
+
+// Primer paso que le falta (para retomar donde quedó)
+function pasoPendiente() {
+  const p = estado.perfil || {};
+  if (!p.cv && !p.linkedin) return 1;
+  if (!p.puestos?.length || !p.ingles) return 2;
+  if (!p.cv && !p.linkedin) return 3;
+  if (!estado.ajustes?.ubicacionElegida) return 4;
+  if (!estado.ajustes?.telegramChatId) return 5;
+  return 6;
+}
+
+async function empezarBienvenida() {
+  document.body.classList.add('en-flujo');
+  for (const id of SECCIONES) $(`#${id}`).hidden = true;
+  $('#flujo').hidden = false;
+  const nombre = primerNombre(estado.quien?.nombre) || 'vos';
+  document.querySelectorAll('[data-nombre]').forEach((e) => { e.textContent = nombre; });
+  document.querySelectorAll('[data-duena]').forEach((e) => { e.textContent = DUENA; });
+  try { estado.perfil = (await api('perfil')).perfil; } catch {}
+  const p = estado.perfil || {};
+  flujo.puestos = [...(p.puestos || [])];
+  flujo.ingles = p.ingles || '';
+  $('#f-linkedin').value = p.linkedin || ''; $('#f-portfolio').value = p.portfolio || ''; $('#f-web').value = p.web || ''; $('#f-contexto').value = p.contexto || '';
+  if (p.cv) marcarCvListo(p.cv.nombre, p.cv.tamano, true);
+  pintarIngles();
+  // Ubicación
+  $('#f-ubicacion').innerHTML = estado.ubicaciones.map((u) => `<option value="${u.id}">${esc(u.nombre)}</option>`).join('');
+  $('#f-ubicacion').value = estado.ajustes.ubicacion || 'remoto-ar';
+  $('#f-ubicacion-libre').value = estado.ajustes.ubicacionLibre || '';
+  $('#f-ubicacion-libre').hidden = $('#f-ubicacion').value !== 'otra';
+  document.querySelectorAll('[name="f-modalidad"]').forEach((c) => { c.checked = (estado.ajustes.modalidades || ['remoto', 'hibrido']).includes(c.value); });
+  // Si ya había avanzado, el botón de la bienvenida lo lleva a donde quedó
+  const pendiente = pasoPendiente();
+  const boton = document.querySelector('.flujo-paso[data-paso="0"] [data-flujo-seguir]');
+  boton.textContent = pendiente > 1 ? 'Seguir donde quedé →' : 'Empezar →';
+  boton.dataset.irA = String(pendiente);
+  mostrarPaso(0);
+}
+function salirDelFlujo() {
+  document.body.classList.remove('en-flujo');
+  $('#flujo').hidden = true;
+  ir('hoy');
+  pintarPedido();
   api('historial').then((h) => { estado.historial = h.historial; pintarTodo(); }).catch(() => {});
 }
+
+// Paso 1: CV
+function marcarCvListo(nombre, tamano, yaSubido) {
+  $('#f-soltar').classList.add('listo');
+  $('#f-cv-texto').innerHTML = `<b>✓ ${esc(nombre)}</b><br><small>${kb(tamano)} · ${yaSubido ? 'ya está subido · tocá para cambiarlo' : 'se sube al seguir'}</small>`;
+  $('#f-seguir-cv').disabled = false;
+}
+function elegirCvFlujo(archivo) {
+  if (!archivo) return;
+  if (!(archivo.type === 'application/pdf' || /\.pdf$/i.test(archivo.name))) { $('#f-cv-texto').innerHTML = '<b>Ese archivo no es un PDF.</b><br><small>Exportá tu CV como PDF y probá de nuevo.</small>'; return; }
+  if (archivo.size > 3 * 1024 * 1024) { $('#f-cv-texto').innerHTML = `<b>Pesa ${kb(archivo.size)}.</b><br><small>El máximo es 3 MB: probá exportarlo más liviano.</small>`; return; }
+  const lector = new FileReader();
+  lector.onload = () => { flujo.cv = { nombre: archivo.name, base64: String(lector.result).split(',')[1], tamano: archivo.size }; flujo.sinCv = false; marcarCvListo(archivo.name, archivo.size, false); };
+  lector.readAsDataURL(archivo);
+}
+$('#f-cv').addEventListener('change', (e) => elegirCvFlujo(e.target.files[0]));
+['dragenter', 'dragover'].forEach((ev) => $('#f-soltar').addEventListener(ev, (e) => { e.preventDefault(); $('#f-soltar').classList.add('encima'); }));
+['dragleave', 'drop'].forEach((ev) => $('#f-soltar').addEventListener(ev, (e) => { e.preventDefault(); $('#f-soltar').classList.remove('encima'); }));
+$('#f-soltar').addEventListener('drop', (e) => elegirCvFlujo(e.dataTransfer.files[0]));
+$('#f-sin-cv').onclick = () => { flujo.sinCv = true; mostrarPaso(2); };
+
+// Paso 2: puestos e inglés
+function pintarPuestosFlujo() {
+  $('#f-chips').innerHTML = flujo.puestos.map((p, i) => `<span class="puesto">${esc(p)}<button type="button" data-quitar-f="${i}" aria-label="Quitar ${esc(p)}">✕</button></span>`).join('');
+  const elegidos = new Set(flujo.puestos.map((p) => p.toLowerCase()));
+  $('#f-sugerencias').innerHTML = flujo.puestos.length >= 10 ? '' : `<span class="sub" style="margin:0 6px 0 0;font-size:13px">Ideas:</span>${SUGERENCIAS.filter((s) => !elegidos.has(s.toLowerCase())).slice(0, 8).map((s) => `<button type="button" data-sugerencia="${esc(s)}">${esc(s)}</button>`).join('')}`;
+  $('#f-puesto').placeholder = flujo.puestos.length ? 'Agregá otro y apretá Enter' : 'Escribí un puesto y apretá Enter';
+  revisarPuestos();
+}
+function sumarPuestoFlujo(texto) {
+  for (const p of texto.split(/[,;\n]/).map((x) => x.trim()).filter(Boolean)) {
+    if (flujo.puestos.length < 10 && !flujo.puestos.some((x) => x.toLowerCase() === p.toLowerCase())) flujo.puestos.push(p.slice(0, 60));
+  }
+  pintarPuestosFlujo();
+}
+$('#f-puesto').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); sumarPuestoFlujo(e.target.value); e.target.value = ''; }
+  if (e.key === 'Backspace' && !e.target.value && flujo.puestos.length) { flujo.puestos.pop(); pintarPuestosFlujo(); }
+});
+$('#f-puesto').addEventListener('blur', (e) => { if (e.target.value.trim()) { sumarPuestoFlujo(e.target.value); e.target.value = ''; } });
+$('#f-chips').addEventListener('click', (e) => { const b = e.target.closest('[data-quitar-f]'); if (b) { flujo.puestos.splice(Number(b.dataset.quitarF), 1); pintarPuestosFlujo(); } });
+$('#f-sugerencias').addEventListener('click', (e) => { const b = e.target.closest('[data-sugerencia]'); if (b) sumarPuestoFlujo(b.dataset.sugerencia); });
+function pintarIngles() { document.querySelectorAll('#f-ingles [data-ingles]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.ingles === flujo.ingles))); revisarPuestos(); }
+$('#f-ingles').addEventListener('click', (e) => { const b = e.target.closest('[data-ingles]'); if (b) { flujo.ingles = b.dataset.ingles; pintarIngles(); } });
+function revisarPuestos() {
+  const falta = [!flujo.puestos.length && 'al menos un puesto', !flujo.ingles && 'tu nivel de inglés'].filter(Boolean);
+  $('#f-seguir-puestos').disabled = Boolean(falta.length);
+  $('#f-falta-puestos').textContent = falta.length ? `Falta ${falta.join(' y ')}.` : '';
+}
+
+// Paso 3: links
+function revisarLinks() {
+  const sinCv = !flujo.cv && !estado.perfil?.cv;
+  $('#f-linkedin-nota').textContent = sinCv ? '(necesario, porque no subiste CV)' : '(opcional)';
+  const falta = sinCv && !$('#f-linkedin').value.trim();
+  $('#f-seguir-links').disabled = falta;
+  $('#f-falta-links').textContent = falta ? 'Sin CV, necesitamos tu LinkedIn para conocerte.' : '';
+}
+$('#f-linkedin').addEventListener('input', revisarLinks);
+$('#f-ubicacion').addEventListener('change', () => { $('#f-ubicacion-libre').hidden = $('#f-ubicacion').value !== 'otra'; });
+
+// Paso 5: Telegram (mismo bot, link personal)
+$('#f-tg-abrir').onclick = async (e) => {
+  const ventana = window.open('', '_blank');
+  const r = await conRespuesta(e.currentTarget, { cargando: 'Abriendo…', ok: '✓ Abierto', error: 'No se pudo abrir' }, async () => {
+    const { link } = await api('telegram', { accion: 'link' });
+    if (ventana) ventana.location = link; else window.location = link;
+  });
+  $('#f-tg-estado').textContent = r?.ok ? 'Tocá Iniciar en Telegram y volvé para tocar Conectar.' : (ventana?.close(), r?.detalle || '');
+};
+$('#f-tg-conectar').onclick = async (e) => {
+  const r = await conRespuesta(e.currentTarget, { cargando: 'Conectando…', ok: '✓ Conectado', error: 'Todavía no' }, async () => {
+    await api('telegram', { accion: 'conectar' });
+    pintarEstado(await api('ajustes'));
+  });
+  $('#f-tg-estado').textContent = r?.ok ? '✓ ¡Conectado! Fijate en Telegram: te mandamos un saludo.' : r?.detalle || '';
+  if (r?.ok) $('#f-seguir-tg').textContent = 'Terminar →';
+};
+
+// Resumen final
+function pintarResumen() {
+  const p = estado.perfil || {}, a = estado.ajustes || {};
+  const u = estado.ubicaciones.find((x) => x.id === a.ubicacion);
+  const NIVEL = { basico: 'Básico', intermedio: 'Intermedio', avanzado: 'Avanzado', nativo: 'Nativo' };
+  const filas = [
+    ['CV', p.cv ? `✓ ${p.cv.nombre}` : 'No subiste (usamos tu LinkedIn)', !p.cv],
+    ['Puestos', (p.puestos || []).join(', ')],
+    ['Inglés', NIVEL[p.ingles] || '—'],
+    ['Links', [p.linkedin, p.portfolio, p.web].filter(Boolean).map((l) => l.replace(/^https?:\/\/(www\.)?/, '')).join(' · ') || '—'],
+    ['Dónde', `${a.ubicacion === 'otra' ? a.ubicacionLibre : u?.nombre || ''} · ${(a.modalidades || []).map((m) => ({ remoto: 'Remoto', hibrido: 'Híbrido', presencial: 'Presencial' }[m] || m)).join(', ')}`],
+    ['Telegram', a.telegramChatId ? '✓ Conectado' : 'Sin conectar: lo podés hacer en Ajustes', !a.telegramChatId],
+  ];
+  $('#f-resumen').innerHTML = filas.map(([k, v, falta]) => `<li class="${falta ? 'falta' : ''}"><span>${k}</span><span>${esc(v)}</span></li>`).join('');
+}
+
+// Botones Seguir / Atrás: cada paso guarda lo suyo antes de avanzar
+document.addEventListener('click', async (e) => {
+  const atras = e.target.closest('[data-flujo-atras]');
+  if (atras) { mostrarPaso(flujo.paso === 2 && flujo.sinCv ? 1 : Math.max(0, flujo.paso - 1)); return; }
+  const seguir = e.target.closest('[data-flujo-seguir]');
+  if (!seguir || seguir.disabled) return;
+  const paso = flujo.paso;
+  if (paso === 0) { mostrarPaso(Number(seguir.dataset.irA) || 1); return; }
+  const guardar = {
+    1: async () => { if (flujo.cv) { estado.perfil = (await api('perfil', { cv: { nombre: flujo.cv.nombre, base64: flujo.cv.base64 } })).perfil; flujo.cv = null; } },
+    2: async () => { estado.perfil = (await api('perfil', { puestos: flujo.puestos, ingles: flujo.ingles })).perfil; },
+    3: async () => { estado.perfil = (await api('perfil', { linkedin: $('#f-linkedin').value, portfolio: $('#f-portfolio').value, web: $('#f-web').value, contexto: $('#f-contexto').value })).perfil; },
+    4: async () => {
+      const modalidades = [...document.querySelectorAll('[name="f-modalidad"]:checked')].map((c) => c.value);
+      pintarEstado(await api('ajustes', { ubicacion: $('#f-ubicacion').value, ubicacionLibre: $('#f-ubicacion-libre').value, modalidades: modalidades.length ? modalidades : ['remoto'], ubicacionElegida: true }));
+    },
+    5: async () => { pintarEstado(await api('ajustes', { bienvenidaTerminada: true })); },
+  }[paso];
+  const esEnlace = seguir.classList.contains('enlace');
+  const textos = { cargando: paso === 1 && flujo.cv ? 'Subiendo tu CV…' : 'Guardando…', ok: '✓ Listo', error: 'No se pudo guardar' };
+  const r = esEnlace ? await guardar().then(() => ({ ok: true }), (err) => ({ ok: false, detalle: err.message })) : await conRespuesta(seguir, textos, guardar);
+  if (!r?.ok) { const nota = document.querySelector(`.flujo-paso[data-paso="${paso}"] .flujo-acciones .sub`); if (nota) nota.textContent = r?.detalle || 'Algo falló, probá de nuevo.'; return; }
+  setTimeout(() => mostrarPaso(paso + 1), esEnlace ? 0 : 350);
+});
+
+$('#f-pedir').onclick = async (e) => {
+  const r = await conRespuesta(e.currentTarget, { cargando: 'Pidiendo…', ok: '✓ ¡Pedida!', error: 'No se pudo pedir' }, async () => { estado.pedido = (await api('pedido', { nota: 'Primera búsqueda' })).pedido; });
+  if (r?.ok) setTimeout(salirDelFlujo, 900);
+};
+$('#f-ir-radar').onclick = salirDelFlujo;
 
 // ── Personas con acceso (solo la dueña) ─────────────────────────────────────
 const SITIO = location.origin;
@@ -1193,16 +1559,20 @@ $('#salir').onclick = () => {
   location.reload();
 };
 
-// Inicio
+// Inicio: la pantalla de carga se va recién cuando sabemos quién entró
+function listo() { document.body.classList.remove('preparando'); }
 $('#fecha-hoy').textContent = new Date().toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
 (async () => {
   try {
     pintarEstado(await api('ajustes'));
-    if (!estado.quien.admin && !estado.perfilCompleto) { empezarBienvenida(); return; }
+    // Un invitado que todavía no terminó la bienvenida va directo al recorrido guiado.
+    if (!estado.quien.admin && !estado.ajustes.bienvenidaTerminada) { await empezarBienvenida(); listo(); return; }
+    listo();
     estado.historial = (await api('historial')).historial;
     pintarTodo();
     if (estado.quien.admin) cargarPersonas();
   } catch (e) {
+    listo();
     $('#avisos').innerHTML = `<div class="aviso error">${esc(e.message)}</div>`;
   }
 })();

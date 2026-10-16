@@ -19,6 +19,9 @@ function limpiar(cuerpo = {}) {
   }
   if (entre(cuerpo.minimo, 3, 6)) c.minimo = cuerpo.minimo;
   if (entre(cuerpo.puntajeMinimo, 40, 85)) c.puntajeMinimo = cuerpo.puntajeMinimo;
+  // Marcas del recorrido de bienvenida (solo se prenden).
+  if (cuerpo.ubicacionElegida === true) c.ubicacionElegida = true;
+  if (cuerpo.bienvenidaTerminada === true) c.bienvenidaTerminada = true;
   return c;
 }
 
