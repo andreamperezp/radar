@@ -193,6 +193,8 @@ h2.flujo-titulo { font-size: clamp(26px, 4.5vw, 36px); }
 .flujo-siguiente h3 { margin: 0 0 4px; font-size: 16px; }
 .flujo-siguiente p { margin: 0; color: var(--tinta-suave); }
 .en-flujo .pestanas, .en-flujo footer { display: none !important; }
+.salir-flujo { display: none; padding: 7px 14px; font-size: 13px; }
+.en-flujo .salir-flujo { display: inline-flex; }
 @media (max-width: 760px) {
   .opciones-grandes { grid-template-columns: 1fr 1fr; }
   .flujo-texto { font-size: 16px; }
@@ -328,6 +330,7 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
 <div class="envoltura">
   <header class="barra">
     <a class="marca" href="/"><img src="/favicon.svg" alt=""><span>radar <span class="mono" style="color:var(--coral-fuerte)" id="iniciales">·</span></span></a>
+    <button class="boton claro salir-flujo" type="button" id="salir-flujo">Salir</button>
     <nav class="pestanas" role="tablist" aria-label="Secciones" id="navegacion">
       <button role="tab" aria-selected="true" data-ir="hoy">Hoy</button>
       <button role="tab" aria-selected="false" data-ir="seguimiento">Seguimiento <span class="contador mono" id="cont-seguimiento" hidden></span></button>
@@ -1553,11 +1556,17 @@ document.addEventListener('click', async (e) => {
 });
 
 // Salir: borra la clave guardada en este navegador (útil si la compu es compartida o para probar como otra persona).
-$('#salir').onclick = () => {
-  if (!confirm('¿Salir de esta cuenta en este navegador? Para volver a entrar vas a necesitar la clave.')) return;
+function salirDeLaCuenta() {
+  const enCamino = document.body.classList.contains('en-flujo');
+  const aviso = enCamino
+    ? '¿Salir por ahora? Lo que ya completaste queda guardado: cuando vuelvas a entrar con tu clave, seguís donde quedaste.'
+    : '¿Salir de esta cuenta en este navegador? Para volver a entrar vas a necesitar la clave.';
+  if (!confirm(aviso)) return;
   try { localStorage.removeItem('radar-clave'); } catch {}
   location.reload();
-};
+}
+$('#salir').onclick = salirDeLaCuenta;
+$('#salir-flujo').onclick = salirDeLaCuenta;
 
 // Inicio: la pantalla de carga se va recién cuando sabemos quién entró
 function listo() { document.body.classList.remove('preparando'); }
