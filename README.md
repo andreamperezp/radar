@@ -22,6 +22,24 @@ Cuando tocás **Ya apliqué** en una vacante:
 - pasa a la pestaña **Seguimiento**: un tablero Aplicada → Entrevista → Oferta / No quedó, con notas, días desde que
   aplicaste (a los 10 días te sugiere escribirles) y métricas de cuántas te respondieron.
 
+## Personas con acceso (invitados)
+
+Andrea es la dueña (entra con `APP_PASSWORD`). Desde **Ajustes → Personas con acceso** invita a alguien: el radar crea una
+clave solo para esa persona (se muestra una vez, se guarda cifrada) y un mensaje listo para mandarle.
+
+- Cada persona tiene **su propio radar**, separado: perfil, CV, ajustes, vacantes, seguimiento y Telegram
+  (`radar/personas/<id>/` en Blob). Andrea sigue en `radar/*.json` como siempre.
+- La primera vez, el invitado ve una **bienvenida**: sube su CV en PDF, sus links, los puestos que busca y su inglés;
+  después elige dónde trabajar y conecta Telegram con un **link personal** (`t.me/<bot>?start=<código>`), así el mismo
+  bot sirve para todos sin mezclar avisos.
+- Su **búsqueda rápida** usa sus puestos. La **búsqueda a fondo** usa el plan Pro de Andrea: el invitado toca
+  "Pedir búsqueda a fondo", a Andrea le llega un aviso por Telegram y ella corre `/radar <id>` en Claude Code.
+  La primera vez Claude lee su CV y su web y le arma el perfil (`perfilTexto`, búsquedas y palabras clave).
+- Andrea puede crear una clave nueva, quitar el acceso o devolverlo. Quitar el acceso no borra los datos.
+
+Rutas: `api/personas.js` (solo la dueña), `api/perfil.js` (perfil y CV), `api/pedido.js` (pedir búsqueda).
+Cada ruta corre "dentro" del radar de quien hace el pedido (`lib/contexto.js` + `conPerfil` en `lib/acceso.js`).
+
 ## Gmail: seguimiento automático de respuestas
 
 `apps-script/RadarGmail.gs` corre gratis en tu cuenta de Google (Apps Script) y cada 3 horas le pasa a la web los

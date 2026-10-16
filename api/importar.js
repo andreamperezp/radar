@@ -1,6 +1,6 @@
 // Recibe las vacantes que eligió Claude Code (/radar), las guarda y te avisa por Telegram.
-import { autorizado, pedirClave, urlDelSitio } from '../lib/acceso.js';
-import { leerAjustes, leerHistorial, sumarAlHistorial, marcarEmpresasAplicadas } from '../lib/almacen.js';
+import { conPerfil, urlDelSitio } from '../lib/acceso.js';
+import { leerAjustes, guardarAjustes, leerHistorial, sumarAlHistorial, marcarEmpresasAplicadas } from '../lib/almacen.js';
 import { enviar, hayTelegram, mensajeDeVacantes } from '../lib/telegram.js';
 
 const texto = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
@@ -28,9 +28,8 @@ function limpiar(v) {
   };
 }
 
-export default async function handler(req, res) {
+export default (req, res) => conPerfil(req, res, async () => {
   if (req.method !== 'POST') return res.status(405).end();
-  if (!autorizado(req)) return pedirClave(res);
   const lista = Array.isArray(req.body?.vacantes) ? req.body.vacantes.slice(0, 20).map(limpiar).filter(Boolean) : null;
   if (!lista) return res.status(400).json({ error: 'Mandá { vacantes: [...] }' });
 
@@ -53,5 +52,7 @@ export default async function handler(req, res) {
   } else if (hayTelegram() && !telegramChatId) {
     telegram = 'falta conectar tu chat (Ajustes → Conectar)';
   }
+  // La búsqueda a fondo que había pedido esta persona ya está hecha.
+  await guardarAjustes({ pedido: null, ultimaBusquedaAFondo: new Date().toISOString() });
   res.json({ guardadas: nuevas.length, repetidas, telegram, vacantes: enviadas });
-}
+});

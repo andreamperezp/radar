@@ -1,6 +1,6 @@
 // Recibe los mails nuevos que manda tu script de Gmail (Apps Script), los une a tus postulaciones
 // y te avisa por Telegram solo cuando avanzás (entrevista u oferta).
-import { autorizado, pedirClave, urlDelSitio } from '../lib/acceso.js';
+import { conPerfil, urlDelSitio } from '../lib/acceso.js';
 import { leerHistorial, leerAjustes, guardarAjustes, leerDato, guardarDato, guardarHistorial, EN_SEGUIMIENTO } from '../lib/almacen.js';
 import { clasificar, buscarPostulacion, vieneDePlataforma, ETAPA_POR_TIPO, ORDEN_ETAPAS } from '../lib/correo.js';
 import { enviar, hayTelegram } from '../lib/telegram.js';
@@ -46,9 +46,8 @@ function resumenDeRevision(resultado, cadaHoras) {
     : `✅ <b>Revisión de Gmail completada</b> · ${hora(ahora)}\nSin novedades de tus postulaciones.${proxima}`;
 }
 
-export default async function handler(req, res) {
+export default (req, res) => conPerfil(req, res, async () => {
   if (req.method !== 'POST') return res.status(405).end();
-  if (!autorizado(req)) return pedirClave(res);
   const correos = Array.isArray(req.body?.correos) ? req.body.correos.slice(0, 50) : null;
   if (!correos) return res.status(400).json({ error: 'Mandá { correos: [...] }' });
 
@@ -109,4 +108,4 @@ export default async function handler(req, res) {
     }
   }
   res.json({ procesados: resultado.length, resultado, resumen });
-}
+});

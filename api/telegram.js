@@ -1,25 +1,39 @@
-// Conectar tu chat de Telegram y mandar un mensaje de prueba.
-import { autorizado, pedirClave } from '../lib/acceso.js';
+// Conectar el Telegram de cada persona y mandar un mensaje de prueba.
+// Cada persona tiene un código propio: abre t.me/<bot>?start=<código>, toca "Iniciar" y después "Conectar".
+import { randomBytes } from 'node:crypto';
+import { conPerfil } from '../lib/acceso.js';
 import { leerAjustes, guardarAjustes } from '../lib/almacen.js';
-import { enviar, hayTelegram, ultimoChat } from '../lib/telegram.js';
+import { enviar, hayTelegram, chatConCodigo, nombreDelBot } from '../lib/telegram.js';
 
-export default async function handler(req, res) {
+async function codigoPropio() {
+  const a = await leerAjustes();
+  if (a.telegramCodigo) return a.telegramCodigo;
+  const codigo = randomBytes(6).toString('hex');
+  await guardarAjustes({ telegramCodigo: codigo });
+  return codigo;
+}
+
+export default (req, res) => conPerfil(req, res, async (perfil) => {
   if (req.method !== 'POST') return res.status(405).end();
-  if (!autorizado(req)) return pedirClave(res);
   if (!hayTelegram()) return res.status(400).json({ error: 'Falta TELEGRAM_BOT_TOKEN en Vercel.' });
   try {
-    if (req.body?.accion === 'conectar') {
-      const chat = await ultimoChat();
-      if (!chat) return res.status(404).json({ error: 'No encontré mensajes. Abrí tu bot en Telegram, mandale "hola" y volvé a tocar Conectar.' });
+    const accion = req.body?.accion;
+    if (accion === 'link') {
+      const [bot, codigo] = await Promise.all([nombreDelBot(), codigoPropio()]);
+      return res.json({ link: `https://t.me/${bot}?start=${codigo}`, bot });
+    }
+    if (accion === 'conectar') {
+      const chat = await chatConCodigo(await codigoPropio());
+      if (!chat) return res.status(404).json({ error: 'Todavía no veo tu "Iniciar". Abrí el link de Telegram, tocá Iniciar (Start) y volvé a tocar Conectar.' });
       await guardarAjustes({ telegramChatId: chat.id });
-      await enviar(chat.id, `👋 ¡Listo${chat.nombre ? `, ${chat.nombre}` : ''}! Desde ahora te aviso por acá las vacantes del día.`);
+      await enviar(chat.id, `👋 ¡Listo${chat.nombre ? `, ${chat.nombre}` : ''}! Soy tu radar de vacantes. Desde ahora te aviso por acá las vacantes que encajan con vos.`);
       return res.json({ ok: true });
     }
     const { telegramChatId } = await leerAjustes();
     if (!telegramChatId) return res.status(400).json({ error: 'Primero conectá tu chat.' });
-    await enviar(telegramChatId, '🔔 Prueba del radar: si leés esto, los avisos funcionan.');
+    await enviar(telegramChatId, `🔔 Prueba del radar de ${perfil.nombre}: si leés esto, los avisos funcionan.`);
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
-}
+});

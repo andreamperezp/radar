@@ -103,7 +103,7 @@ h1 em { font-style: normal; background: linear-gradient(transparent 62%, var(--r
 .etiqueta { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; padding: 2px 8px; border-radius: 6px; background: var(--fondo); border: 1px solid var(--linea); }
 .vacio { text-align: center; padding: 40px 16px; color: var(--gris); background: var(--tarjeta); border: 1px dashed var(--linea); border-radius: 18px; }
 
-section[hidden] { display: none; }
+[hidden] { display: none !important; }
 h2 { font-size: 26px; letter-spacing: -.025em; margin: 40px 0 6px; }
 .sub { color: var(--gris); margin: 0 0 18px; }
 .panel { background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 18px; padding: 22px; box-shadow: var(--sombra); display: grid; gap: 20px; }
@@ -142,6 +142,50 @@ input[type="range"] { width: 100%; accent-color: var(--coral-fuerte); }
 dialog { border: 0; border-radius: 18px; padding: 24px; width: min(420px, calc(100% - 32px)); background: var(--tarjeta); color: var(--tinta); box-shadow: 0 20px 60px rgba(0,0,0,.25); }
 dialog::backdrop { background: rgba(21,26,35,.45); }
 dialog h3 { margin: 0 0 6px; } dialog p { margin: 0 0 14px; color: var(--gris); font-size: 14px; }
+/* Perfil y bienvenida */
+input[type="url"], textarea { width: 100%; font: inherit; padding: 11px 12px; border: 1px solid var(--linea); border-radius: 10px; background: var(--fondo); color: var(--tinta); }
+textarea { resize: vertical; line-height: 1.5; }
+input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--coral); outline-offset: 1px; border-color: transparent; }
+.fila.tres { grid-template-columns: repeat(3, 1fr); }
+.opcional { font-weight: 500; color: var(--gris); }
+.bienvenida { margin: 28px 0 10px; }
+.bienvenida h1 { font-size: clamp(30px, 5vw, 44px); }
+.pasitos { list-style: none; padding: 0; margin: 0 0 18px; display: flex; flex-wrap: wrap; gap: 8px; counter-reset: paso; }
+.pasitos li { counter-increment: paso; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--gris); border: 1px solid var(--linea); border-radius: 999px; padding: 5px 12px 5px 6px; background: var(--tarjeta); }
+.pasitos li::before { content: counter(paso); width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; background: var(--linea); color: var(--tinta); }
+.pasitos li.activo { color: var(--tinta); border-color: var(--coral); }
+.pasitos li.activo::before { background: var(--coral); color: #1E2430; }
+.pasitos li.hecho::before { content: '✓'; background: var(--menta); color: #1E2430; }
+.soltar-cv { display: flex; align-items: center; gap: 14px; border: 2px dashed var(--linea); border-radius: 14px; padding: 18px; cursor: pointer; background: var(--fondo); transition: border-color .15s ease, background .15s ease; margin: 0; font-weight: 500 !important; }
+.soltar-cv:hover, .soltar-cv.encima { border-color: var(--coral); background: color-mix(in srgb, var(--coral) 8%, var(--fondo)); }
+.soltar-cv.listo { border-style: solid; border-color: var(--menta); }
+.soltar-icono { font-size: 26px; }
+.chips-puestos { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.chips-puestos:empty { display: none; }
+.puesto { display: inline-flex; align-items: center; gap: 6px; background: color-mix(in srgb, var(--menta) 40%, var(--tarjeta)); color: var(--tinta); border-radius: 999px; padding: 4px 6px 4px 12px; font-size: 13px; font-weight: 700; }
+.puesto button { border: 0; width: 20px; height: 20px; border-radius: 50%; background: rgba(0,0,0,.12); color: inherit; font-size: 12px; line-height: 1; display: grid; place-items: center; padding: 0; }
+.acciones-form { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.acciones-form .sub { margin: 0; }
+.acciones-form .sub.alerta { color: var(--coral-fuerte); font-weight: 700; }
+/* Búsqueda a fondo para invitados */
+.a-fondo-texto { flex: 1; }
+.a-fondo-accion { display: grid; gap: 6px; justify-items: center; }
+.estado-pedido, .pedidos-espera { margin: 8px 0 0 !important; font-size: 14px !important; font-weight: 700; color: var(--tinta) !important; }
+/* Personas con acceso */
+.en-linea { display: flex; gap: 10px; }
+.en-linea input { flex: 1; }
+.clave-nueva { border: 2px solid var(--menta); border-radius: 14px; padding: 16px; display: grid; gap: 10px; background: color-mix(in srgb, var(--menta) 12%, var(--tarjeta)); }
+.clave-nueva .clave { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 800; letter-spacing: .04em; word-break: break-all; background: var(--fondo); border-radius: 8px; padding: 10px 12px; }
+.clave-nueva textarea { font-size: 13px; }
+.personas { display: grid; gap: 12px; margin-top: 14px; }
+.persona { background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 16px; padding: 16px 18px; display: grid; gap: 10px; box-shadow: var(--sombra); }
+.persona.espera { border: 2px solid var(--coral); }
+.persona.sin-acceso { opacity: .55; }
+.persona-cabeza { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline; }
+.persona-cabeza h3 { margin: 0; font-size: 18px; }
+.persona-datos { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--gris); }
+.persona-datos b { color: var(--tinta); }
+.persona .acciones { margin-top: 0; }
 .enlace { border: 0; background: none; padding: 0; color: var(--coral-fuerte); font-weight: 700; font-size: inherit; text-decoration: underline; }
 .vacante.saliendo { transition: opacity .3s ease, transform .3s ease; opacity: 0; transform: translateX(16px); }
 .nota-boton { font-size: 13px; color: var(--gris); margin: 10px 0 0; }
@@ -208,6 +252,11 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
   .pestanas button { padding: 6px 10px; }
   .marca span { display: none; }
   .metricas { grid-template-columns: repeat(2, 1fr); }
+  .fila.tres { grid-template-columns: 1fr; }
+  .a-fondo { flex-direction: column; align-items: stretch; }
+  .a-fondo-accion { justify-items: stretch; }
+  .en-linea { flex-direction: column; }
+  .pestanas { overflow-x: auto; max-width: calc(100vw - 72px); scrollbar-width: none; }
   .tablero { grid-template-columns: 1fr; }
   .pestanas { padding: 3px; } .pestanas button { padding: 6px 8px; font-size: 13px; }
 }
@@ -216,12 +265,13 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
 <body>
 <div class="envoltura">
   <header class="barra">
-    <a class="marca" href="/"><img src="/favicon.svg" alt=""><span>radar <span class="mono" style="color:var(--coral-fuerte)">· ap.</span></span></a>
-    <nav class="pestanas" role="tablist" aria-label="Secciones">
+    <a class="marca" href="/"><img src="/favicon.svg" alt=""><span>radar <span class="mono" style="color:var(--coral-fuerte)" id="iniciales">·</span></span></a>
+    <nav class="pestanas" role="tablist" aria-label="Secciones" id="navegacion">
       <button role="tab" aria-selected="true" data-ir="hoy">Hoy</button>
       <button role="tab" aria-selected="false" data-ir="seguimiento">Seguimiento <span class="contador mono" id="cont-seguimiento" hidden></span></button>
       <button role="tab" aria-selected="false" data-ir="historial">Historial</button>
-      <button role="tab" aria-selected="false" data-ir="ajustes">Ajustes</button>
+      <button role="tab" aria-selected="false" data-ir="perfil">Perfil</button>
+      <button role="tab" aria-selected="false" data-ir="ajustes">Ajustes <span class="contador mono" id="cont-pedidos" hidden></span></button>
     </nav>
   </header>
 
@@ -247,10 +297,22 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
       <div class="radar" id="radar" aria-hidden="true"><div class="barrido"></div><div class="centro"></div></div>
     </div>
 
-    <aside class="a-fondo">
+    <aside class="a-fondo" id="a-fondo-duena" hidden>
       <div>
         <div class="kicker mono">Búsqueda a fondo · con Claude</div>
         <p>Escribí <button class="comando mono" id="copiar-radar" title="Copiar">/radar</button> en Claude Code. Busca también en LinkedIn, Computrabajo y Bumeran, lee cada oferta contra tu CV y te la manda acá y a Telegram. Usa tu plan Pro, así que solo corre cuando se lo pedís.</p>
+        <p class="pedidos-espera" id="pedidos-espera" hidden></p>
+      </div>
+    </aside>
+    <aside class="a-fondo" id="a-fondo-invitado" hidden>
+      <div class="a-fondo-texto">
+        <div class="kicker mono">Búsqueda a fondo · con Claude</div>
+        <p>Claude busca también en LinkedIn, Computrabajo y Bumeran, lee cada oferta contra tu CV y te explica por qué encaja. Lo corre <b id="nombre-duena">Andrea</b> desde su cuenta: pedila acá y te llega a tu radar y a tu Telegram.</p>
+        <p class="estado-pedido" id="estado-pedido" hidden></p>
+      </div>
+      <div class="a-fondo-accion">
+        <button class="boton" type="button" id="pedir-busqueda">Pedir búsqueda a fondo</button>
+        <button class="enlace" type="button" id="cancelar-pedido" hidden>Cancelar pedido</button>
       </div>
     </aside>
 
@@ -284,8 +346,78 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
     <div id="lista-historial"></div>
   </section>
 
+  <!-- PERFIL (también es la bienvenida la primera vez) -->
+  <section id="perfil" hidden>
+    <div id="bienvenida" class="bienvenida" hidden>
+      <div class="kicker mono">Bienvenida al radar</div>
+      <h1 id="titulo-bienvenida">¡Hola! Contale al radar quién sos.</h1>
+      <p class="bajada">Este radar trabaja al revés que un reclutador: busca empresas para vos. Para eso necesita conocerte. Con tu CV y tus links, Claude arma tu perfil y te busca vacantes publicadas el mismo día que encajen con vos.</p>
+      <ol class="pasitos">
+        <li class="activo">Tu perfil</li>
+        <li>Dónde querés trabajar</li>
+        <li>Tu Telegram</li>
+      </ol>
+    </div>
+    <div id="encabezado-perfil">
+      <h2>Tu perfil</h2>
+      <p class="sub">Lo que el radar sabe de vos para buscarte trabajo. Si cambiás el CV, Claude lo vuelve a leer en la próxima búsqueda a fondo.</p>
+    </div>
+    <form class="panel" id="form-perfil" novalidate>
+      <div class="fila">
+        <div class="campo">
+          <label for="p-nombre">Tu nombre</label>
+          <input type="text" id="p-nombre" autocomplete="name" placeholder="Nombre y apellido" maxlength="80">
+        </div>
+        <div class="campo">
+          <label for="p-ingles">Tu inglés</label>
+          <select id="p-ingles">
+            <option value="">Elegí tu nivel</option>
+            <option value="basico">Básico: leo algo, me cuesta hablar</option>
+            <option value="intermedio">Intermedio: me defiendo en reuniones</option>
+            <option value="avanzado">Avanzado: trabajo en inglés sin problema</option>
+            <option value="nativo">Nativo o bilingüe</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="p-cv">Tu CV en PDF</label>
+        <label class="soltar-cv" id="soltar-cv" for="p-cv">
+          <input type="file" id="p-cv" accept="application/pdf,.pdf" hidden>
+          <span class="soltar-icono" aria-hidden="true">📄</span>
+          <span id="cv-texto"><b>Elegí tu CV</b> o arrastralo acá · PDF de hasta 3 MB</span>
+        </label>
+        <small id="cv-actual"></small>
+      </div>
+
+      <div class="campo">
+        <label for="p-puestos">¿Qué puestos buscás?</label>
+        <div class="chips-puestos" id="chips-puestos"></div>
+        <input type="text" id="p-puestos" placeholder="Escribí un puesto y apretá Enter · ej. UX Designer, Product Designer">
+        <small>Hasta 10. Cuanto más concretos, mejor: "Diseñador UX/UI" funciona mejor que "diseño".</small>
+      </div>
+
+      <div class="fila tres">
+        <div class="campo"><label for="p-linkedin">LinkedIn</label><input type="url" id="p-linkedin" inputmode="url" placeholder="linkedin.com/in/tu-usuario"></div>
+        <div class="campo"><label for="p-portfolio">Portfolio</label><input type="url" id="p-portfolio" inputmode="url" placeholder="behance.net/… o tu sitio"></div>
+        <div class="campo"><label for="p-web">Otra web (opcional)</label><input type="url" id="p-web" inputmode="url" placeholder="github, blog, proyecto…"></div>
+      </div>
+
+      <div class="campo">
+        <label for="p-contexto">Contale lo que no está en tu CV <span class="opcional">(opcional)</span></label>
+        <textarea id="p-contexto" rows="4" maxlength="2000" placeholder="Qué tipo de empresa te gusta, qué no querés hacer, desde cuándo podés empezar, si buscás freelance o relación de dependencia, salario esperado…"></textarea>
+      </div>
+
+      <div class="acciones-form">
+        <button class="boton" type="submit" id="guardar-perfil">Guardar perfil</button>
+        <span class="sub" id="perfil-falta"></span>
+      </div>
+    </form>
+  </section>
+
   <!-- AJUSTES -->
   <section id="ajustes" hidden>
+    <div class="aviso" id="aviso-onboarding" hidden>¡Perfil guardado! 🎉 Ahora contale al radar <b>dónde querés trabajar</b> y conectá tu <b>Telegram</b> para recibir las vacantes en el celular.</div>
     <h2>Ajustes</h2>
     <p class="sub">El botón de búsqueda rápida y <span class="mono">/radar</span> usan estos ajustes.</p>
     <form class="panel" id="form-ajustes">
@@ -321,20 +453,40 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
     </form>
 
     <h2>Avisos por Telegram</h2>
-    <p class="sub">Cada vez que corrés <span class="mono">/radar</span>, las vacantes elegidas te llegan al celular.</p>
+    <p class="sub">Las vacantes de cada búsqueda a fondo te llegan al celular.</p>
     <div class="panel">
       <ol class="pasos-tg">
-        <li>En Telegram, hablale a <b>@BotFather</b>, mandá <code>/newbot</code> y elegí un nombre (por ejemplo "Radar de Andrea").</li>
-        <li>Copiá el token que te da y cargalo en Vercel como <code>TELEGRAM_BOT_TOKEN</code>.</li>
-        <li>Abrí tu bot nuevo y mandale "hola".</li>
-        <li>Tocá <b>Conectar</b> acá abajo.</li>
+        <li>Tocá <b>Abrir Telegram</b>: se abre el bot del radar con un código que es solo tuyo.</li>
+        <li>En Telegram tocá <b>Iniciar</b> (o <i>Start</i>).</li>
+        <li>Volvé acá y tocá <b>Conectar</b>. Te llega un saludo para confirmar.</li>
       </ol>
       <div class="opciones">
+        <button class="boton claro" type="button" id="tg-abrir">Abrir Telegram ↗</button>
         <button class="boton" type="button" id="tg-conectar">Conectar</button>
-        <button class="boton claro" type="button" id="tg-probar">Mandar prueba</button>      </div>
+        <button class="boton claro" type="button" id="tg-probar">Mandar prueba</button>
+      </div>
       <div id="tg-estado" class="sub" style="margin:0"></div>
     </div>
 
+    <!-- Solo la dueña: personas con acceso -->
+    <div id="bloque-personas" hidden>
+      <h2>Personas con acceso</h2>
+      <p class="sub">Cada persona tiene su propio radar, separado del tuyo: su CV, sus vacantes y su seguimiento. Las búsquedas a fondo usan tu plan Pro, así que corren solo cuando vos escribís <span class="mono">/radar &lt;nombre&gt;</span>.</p>
+      <form class="panel invitar" id="form-invitar">
+        <div class="campo">
+          <label for="nombre-invitado">Invitar a alguien</label>
+          <div class="en-linea">
+            <input type="text" id="nombre-invitado" placeholder="Nombre, ej. Benjamin" maxlength="60" autocomplete="off">
+            <button class="boton" type="submit" id="boton-invitar">Crear acceso</button>
+          </div>
+          <small>Se crea una clave nueva solo para esa persona. La vas a ver una sola vez.</small>
+        </div>
+        <div class="clave-nueva" id="clave-nueva" hidden></div>
+      </form>
+      <div class="personas" id="lista-personas"></div>
+    </div>
+
+    <div id="bloque-gmail" hidden>
     <h2>Gmail</h2>
     <p class="sub">Un script en tu cuenta de Google revisa cada 3 horas los mails de tus postulaciones (no usa tu plan de Claude). "Gracias por postularte" queda anotado; una entrevista o una oferta te llega a Telegram y mueve la tarjeta sola, y al terminar cada revisión te llega "✅ Revisión completada".</p>
     <div class="panel">
@@ -346,15 +498,16 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
         <li>Arriba elegí la función <b>instalar</b> y tocá <b>Ejecutar</b>. Aceptá el permiso de Google.</li>
       </ol>
     </div>
+    </div>
   </section>
 
-  <footer>Hecho para Andrea Pérez · <a href="https://andreaperez.dev">andreaperez.dev</a></footer>
+  <footer><span id="pie-nombre">Radar de vacantes</span> · <button class="enlace" type="button" id="salir">Salir de esta cuenta</button></footer>
 </div>
 
 <dialog id="dialogo-clave">
   <form method="dialog" id="form-clave">
     <h3>Tu clave</h3>
-    <p>El radar es solo tuyo. Escribí la clave que cargaste en Vercel como APP_PASSWORD.</p>
+    <p>Cada persona entra con su propia clave. Si te invitaron, es la que te pasaron junto con este link.</p>
     <input type="password" id="clave" autocomplete="current-password">
     <div class="aviso error" id="error-clave" role="alert" hidden></div>
     <div style="margin-top:14px"><button class="boton" id="entrar" value="ok">Entrar</button></div>
@@ -403,10 +556,12 @@ function pedirClave(mensaje = '', falta = false) {
 
 
 // Pestañas
-const SECCIONES = ['hoy', 'seguimiento', 'historial', 'ajustes'];
+const SECCIONES = ['hoy', 'seguimiento', 'historial', 'perfil', 'ajustes'];
 function ir(seccion) {
   for (const id of SECCIONES) $(`#${id}`).hidden = id !== seccion;
   document.querySelectorAll('.pestanas button').forEach((b) => b.setAttribute('aria-selected', b.dataset.ir === seccion));
+  if (seccion === 'perfil') cargarPerfil();
+  if (seccion === 'ajustes' && estado.quien?.admin) cargarPersonas();
   pintarTodo();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -415,6 +570,8 @@ document.addEventListener('click', (e) => { const b = e.target.closest('[data-ir
 // Estado y ajustes
 function pintarEstado(datos) {
   estado.ajustes = datos.ajustes; estado.ubicaciones = datos.ubicaciones;
+  estado.quien = datos.quien; estado.perfilCompleto = datos.perfilCompleto; estado.pedido = datos.pedido;
+  pintarQuien();
   const a = datos.ajustes;
   const u = datos.ubicaciones.find((x) => x.id === a.ubicacion);
   $('#chip-ubicacion').textContent = a.ubicacion === 'otra' ? (a.ubicacionLibre || 'Otra') : (u?.nombre || a.ubicacion);
@@ -487,6 +644,16 @@ async function accionTelegram(accion, boton) {
 }
 $('#tg-conectar').onclick = (e) => accionTelegram('conectar', e.currentTarget);
 $('#tg-probar').onclick = (e) => accionTelegram('probar', e.currentTarget);
+$('#tg-abrir').onclick = async (e) => {
+  // Se abre la pestaña antes de pedir el link, para que el navegador no la bloquee.
+  const ventana = window.open('', '_blank');
+  const r = await conRespuesta(e.currentTarget, { cargando: 'Abriendo…', ok: '✓ Abierto', error: 'No se pudo abrir' }, async () => {
+    const { link } = await api('telegram', { accion: 'link' });
+    if (ventana) ventana.location = link; else window.location = link;
+  });
+  if (r && !r.ok) { ventana?.close(); $('#tg-estado').textContent = r.detalle; }
+  else $('#tg-estado').textContent = 'Tocá Iniciar en Telegram y después volvé y tocá Conectar.';
+};
 
 // /radar: copiar el comando
 $('#copiar-radar').onclick = async (e) => {
@@ -777,13 +944,264 @@ function pintarTodo() {
   if (!$('#historial').hidden) pintarHistorial();
 }
 
+// ── Quién está usando el radar ──────────────────────────────────────────────
+const iniciales = (n = '') => n.trim().split(/\s+/).slice(0, 2).map((p) => p[0] || '').join('').toLowerCase();
+const primerNombre = (n = '') => n.trim().split(/\s+/)[0] || '';
+function pintarQuien() {
+  const q = estado.quien;
+  if (!q) return;
+  const nombre = q.nombre || '';
+  $('#iniciales').textContent = `· ${iniciales(nombre) || '?'}.`;
+  $('#pie-nombre').innerHTML = q.admin ? 'Hecho para Andrea Pérez · <a href="https://andreaperez.dev">andreaperez.dev</a>' : `Radar de ${esc(nombre)}`;
+  $('#a-fondo-duena').hidden = !q.admin;
+  $('#a-fondo-invitado').hidden = q.admin;
+  $('#bloque-personas').hidden = !q.admin;
+  $('#bloque-gmail').hidden = !q.admin;
+  document.title = q.admin ? 'Radar de vacantes' : `Radar de ${primerNombre(nombre)}`;
+  pintarPedido();
+}
+
+// ── Búsqueda a fondo: el invitado la pide, la dueña la corre ────────────────
+function pintarPedido() {
+  if (estado.quien?.admin) return;
+  const p = estado.pedido;
+  $('#estado-pedido').hidden = !p;
+  $('#cancelar-pedido').hidden = !p;
+  $('#pedir-busqueda').hidden = Boolean(p);
+  if (p) $('#estado-pedido').textContent = `🙋 La pediste el ${new Date(p.fecha).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })} a las ${new Date(p.fecha).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false })} h. Cuando esté lista te llega a Telegram y aparece acá.`;
+}
+$('#pedir-busqueda').onclick = async (e) => {
+  if (!estado.perfilCompleto) { ir('perfil'); return; }
+  const r = await conRespuesta(e.currentTarget, { cargando: 'Pidiendo…', ok: '✓ Pedida', error: 'No se pudo pedir' }, async () => {
+    estado.pedido = (await api('pedido', {})).pedido;
+  });
+  if (r && !r.ok) $('#avisos').innerHTML = `<div class="aviso error">${esc(r.detalle)}</div>`;
+  setTimeout(pintarPedido, r?.ok ? 1200 : 0);
+};
+$('#cancelar-pedido').onclick = async () => {
+  estado.pedido = (await api('pedido', { accion: 'cancelar' })).pedido;
+  pintarPedido();
+};
+
+// ── Perfil: CV, puestos y links ─────────────────────────────────────────────
+let puestos = [];
+let cvNuevo = null; // { nombre, base64, tamano }
+const kb = (n) => (n > 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(1)} MB` : `${Math.round(n / 1024)} KB`);
+
+function pintarPuestos() {
+  $('#chips-puestos').innerHTML = puestos.map((p, i) => `<span class="puesto">${esc(p)}<button type="button" data-quitar-puesto="${i}" aria-label="Quitar ${esc(p)}">✕</button></span>`).join('');
+  $('#p-puestos').placeholder = puestos.length ? 'Agregá otro puesto y apretá Enter' : 'Escribí un puesto y apretá Enter · ej. UX Designer, Product Designer';
+}
+function sumarPuestos(texto) {
+  for (const p of texto.split(/[,;\n]/).map((x) => x.trim()).filter(Boolean)) {
+    if (puestos.length < 10 && !puestos.some((x) => x.toLowerCase() === p.toLowerCase())) puestos.push(p.slice(0, 60));
+  }
+  pintarPuestos();
+}
+$('#p-puestos').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); sumarPuestos(e.target.value); e.target.value = ''; }
+  if (e.key === 'Backspace' && !e.target.value && puestos.length) { puestos.pop(); pintarPuestos(); }
+});
+$('#p-puestos').addEventListener('blur', (e) => { if (e.target.value.trim()) { sumarPuestos(e.target.value); e.target.value = ''; } });
+$('#chips-puestos').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-quitar-puesto]');
+  if (b) { puestos.splice(Number(b.dataset.quitarPuesto), 1); pintarPuestos(); }
+});
+
+function elegirCv(archivo) {
+  if (!archivo) return;
+  const esPdf = archivo.type === 'application/pdf' || /\.pdf$/i.test(archivo.name);
+  if (!esPdf) { $('#cv-texto').innerHTML = '<b>Ese archivo no es un PDF.</b> Exportá tu CV como PDF y probá de nuevo.'; return; }
+  if (archivo.size > 3 * 1024 * 1024) { $('#cv-texto').innerHTML = `<b>Pesa ${kb(archivo.size)}.</b> El máximo es 3 MB: probá exportarlo más liviano.`; return; }
+  const lector = new FileReader();
+  lector.onload = () => {
+    cvNuevo = { nombre: archivo.name, base64: String(lector.result).split(',')[1], tamano: archivo.size };
+    $('#soltar-cv').classList.add('listo');
+    $('#cv-texto').innerHTML = `<b>${esc(archivo.name)}</b> · ${kb(archivo.size)} · se sube al guardar`;
+    revisarFaltantes();
+  };
+  lector.readAsDataURL(archivo);
+}
+$('#p-cv').addEventListener('change', (e) => elegirCv(e.target.files[0]));
+const zona = $('#soltar-cv');
+['dragenter', 'dragover'].forEach((ev) => zona.addEventListener(ev, (e) => { e.preventDefault(); zona.classList.add('encima'); }));
+['dragleave', 'drop'].forEach((ev) => zona.addEventListener(ev, (e) => { e.preventDefault(); zona.classList.remove('encima'); }));
+zona.addEventListener('drop', (e) => elegirCv(e.dataTransfer.files[0]));
+
+function revisarFaltantes() {
+  const falta = [];
+  if (!puestos.length) falta.push('qué puestos buscás');
+  if (!cvNuevo && !estado.perfil?.cv && !$('#p-linkedin').value.trim()) falta.push('tu CV o tu LinkedIn');
+  $('#perfil-falta').textContent = falta.length ? `Para empezar falta: ${falta.join(' y ')}.` : '';
+  return falta;
+}
+['input', 'change'].forEach((ev) => $('#form-perfil').addEventListener(ev, revisarFaltantes));
+
+async function cargarPerfil() {
+  const { perfil } = await api('perfil');
+  estado.perfil = perfil;
+  $('#p-nombre').value = perfil.nombre || '';
+  $('#p-ingles').value = perfil.ingles || '';
+  $('#p-linkedin').value = perfil.linkedin || '';
+  $('#p-portfolio').value = perfil.portfolio || '';
+  $('#p-web').value = perfil.web || '';
+  $('#p-contexto').value = perfil.contexto || '';
+  puestos = [...(perfil.puestos || [])];
+  pintarPuestos();
+  cvNuevo = null;
+  $('#soltar-cv').classList.toggle('listo', Boolean(perfil.cv));
+  $('#cv-texto').innerHTML = perfil.cv ? '<b>Cambiar CV</b> · elegí o arrastrá otro PDF' : '<b>Elegí tu CV</b> o arrastralo acá · PDF de hasta 3 MB';
+  $('#cv-actual').innerHTML = perfil.cv ? `Tenés subido <b>${esc(perfil.cv.nombre)}</b> (${kb(perfil.cv.tamano)}, ${new Date(perfil.cv.subido).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}) · <a href="#" id="ver-cv">verlo</a>` : '';
+  revisarFaltantes();
+}
+document.addEventListener('click', async (e) => {
+  if (e.target.id !== 'ver-cv') return;
+  e.preventDefault();
+  // El CV es privado: se pide con la clave y se abre como archivo local.
+  const r = await fetch('/api/perfil?cv=1', { headers: { 'x-clave': leerLocal('radar-clave') || '' } });
+  if (r.ok) window.open(URL.createObjectURL(await r.blob()), '_blank');
+});
+
+$('#form-perfil').onsubmit = async (e) => {
+  e.preventDefault();
+  if ($('#p-puestos').value.trim()) { sumarPuestos($('#p-puestos').value); $('#p-puestos').value = ''; }
+  if (revisarFaltantes().length) { $('#perfil-falta').classList.add('alerta'); return; }
+  const eraBienvenida = !$('#bienvenida').hidden;
+  const r = await conRespuesta($('#guardar-perfil'), { cargando: cvNuevo ? 'Subiendo CV…' : 'Guardando…', ok: '✓ Perfil guardado', error: 'No se pudo guardar' }, async () => {
+    const res = await api('perfil', {
+      nombre: $('#p-nombre').value, ingles: $('#p-ingles').value, puestos,
+      linkedin: $('#p-linkedin').value, portfolio: $('#p-portfolio').value, web: $('#p-web').value, contexto: $('#p-contexto').value,
+      ...(cvNuevo ? { cv: { nombre: cvNuevo.nombre, base64: cvNuevo.base64 } } : {}),
+    });
+    estado.perfil = res.perfil;
+    estado.perfilCompleto = res.completo;
+  });
+  if (!r?.ok) { $('#perfil-falta').textContent = r?.detalle || ''; return; }
+  pintarEstado(await api('ajustes'));
+  if (eraBienvenida) setTimeout(terminarBienvenida, 900);
+  else setTimeout(cargarPerfil, 900);
+};
+
+// ── Primera vez de un invitado: perfil → dónde trabajar → Telegram ──────────
+function empezarBienvenida() {
+  $('#navegacion').hidden = true;
+  $('#bienvenida').hidden = false;
+  $('#encabezado-perfil').hidden = true;
+  $('#titulo-bienvenida').textContent = `¡Hola${estado.quien?.nombre ? `, ${primerNombre(estado.quien.nombre)}` : ''}! Contale al radar quién sos.`;
+  $('#guardar-perfil').textContent = 'Guardar y seguir →';
+  ir('perfil');
+}
+function terminarBienvenida() {
+  $('#navegacion').hidden = false;
+  $('#bienvenida').hidden = true;
+  $('#encabezado-perfil').hidden = false;
+  $('#guardar-perfil').dataset.original = 'Guardar perfil';
+  $('#guardar-perfil').textContent = 'Guardar perfil';
+  $('#aviso-onboarding').hidden = false;
+  ir('ajustes');
+  api('historial').then((h) => { estado.historial = h.historial; pintarTodo(); }).catch(() => {});
+}
+
+// ── Personas con acceso (solo la dueña) ─────────────────────────────────────
+const SITIO = location.origin;
+function mensajeInvitacion(nombre, clave) {
+  return `¡Hola ${primerNombre(nombre)}! Te armé un radar de vacantes: busca trabajos publicados el mismo día que encajan con tu CV y te avisa por Telegram.\n\n1. Entrá a ${SITIO}\n2. Usá esta clave: ${clave}\n3. Subí tu CV, contale qué buscás y conectá tu Telegram.\n\nLa clave es solo tuya, no la compartas.`;
+}
+function mostrarClave(nombre, clave, esNueva) {
+  const caja = $('#clave-nueva');
+  caja.hidden = false;
+  caja.innerHTML = `
+    <b>${esNueva ? 'Acceso creado' : 'Clave nueva'} para ${esc(nombre)}. Copiala ahora: después no la vas a poder ver.</b>
+    <div class="clave">${esc(clave)}</div>
+    <label for="mensaje-invitacion" class="sub" style="margin:0">Mensaje listo para mandarle (por WhatsApp, por ejemplo):</label>
+    <textarea id="mensaje-invitacion" rows="7" readonly>${esc(mensajeInvitacion(nombre, clave))}</textarea>
+    <div class="opciones"><button class="boton" type="button" id="copiar-invitacion">Copiar mensaje</button><button class="boton claro" type="button" id="cerrar-clave">Listo, ya lo copié</button></div>`;
+  caja.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+$('#clave-nueva').addEventListener('click', async (e) => {
+  if (e.target.id === 'copiar-invitacion') {
+    await conRespuesta(e.target, { cargando: 'Copiando…', ok: '✓ Copiado', error: 'Copialo a mano' }, () => navigator.clipboard.writeText($('#mensaje-invitacion').value));
+  }
+  if (e.target.id === 'cerrar-clave') { $('#clave-nueva').hidden = true; $('#clave-nueva').innerHTML = ''; }
+});
+$('#form-invitar').onsubmit = async (e) => {
+  e.preventDefault();
+  const nombre = $('#nombre-invitado').value.trim();
+  if (!nombre) { $('#nombre-invitado').focus(); return; }
+  let creada;
+  await conRespuesta($('#boton-invitar'), { cargando: 'Creando…', ok: '✓ Creado', error: 'No se pudo crear' }, async () => { creada = await api('personas', { accion: 'invitar', nombre }); });
+  if (creada) { $('#nombre-invitado').value = ''; mostrarClave(creada.nombre, creada.clave, true); cargarPersonas(); }
+};
+
+function pintarPersonas(lista) {
+  // Primero quien espera una búsqueda; después las activas; al final las que no tienen acceso.
+  lista = [...lista].sort((a, b) => (Boolean(b.activo && b.pedido) - Boolean(a.activo && a.pedido)) || (b.activo - a.activo));
+  const esperando = lista.filter((p) => p.activo && p.pedido);
+  $('#cont-pedidos').hidden = !esperando.length;
+  $('#cont-pedidos').textContent = esperando.length;
+  $('#pedidos-espera').hidden = !esperando.length;
+  $('#pedidos-espera').innerHTML = esperando.map((p) => `🙋 ${esc(p.nombre)} pidió una búsqueda: escribí <button class="comando mono" data-copiar="/radar ${esc(p.id)}">/radar ${esc(p.id)}</button>`).join('<br>');
+  $('#lista-personas').innerHTML = lista.length ? lista.map((p) => `
+    <article class="persona ${p.pedido && p.activo ? 'espera' : ''} ${p.activo ? '' : 'sin-acceso'}" data-id="${esc(p.id)}">
+      <div class="persona-cabeza">
+        <h3>${esc(p.nombre)}</h3>
+        <span class="sub" style="margin:0">${p.activo ? `Invitado el ${new Date(p.creado).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}` : 'Sin acceso'}</span>
+      </div>
+      ${p.pedido && p.activo ? `<div class="aviso" style="margin:0">🙋 Pidió una búsqueda a fondo el ${new Date(p.pedido.fecha).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}${p.pedido.nota ? `: “${esc(p.pedido.nota)}”` : ''}. Escribí <button class="comando mono" data-copiar="/radar ${esc(p.id)}">/radar ${esc(p.id)}</button> en Claude Code.</div>` : ''}
+      <div class="persona-datos">
+        <span>Perfil: <b>${p.perfil.puestos.length ? esc(p.perfil.puestos.join(', ')) : 'sin completar'}</b></span>
+        <span>CV ${p.perfil.cv ? '<b>✓</b>' : '✗'}</span>
+        <span>Telegram ${p.telegram ? '<b>✓</b>' : '✗'}</span>
+        <span>Armado por Claude ${p.perfil.armadoPorClaude ? '<b>✓</b>' : '✗'}</span>
+        <span><b>${p.vacantes}</b> vacantes · <b>${p.aplicadas}</b> postulaciones</span>
+        ${p.ultimaBusquedaAFondo ? `<span>Última búsqueda a fondo: <b>${new Date(p.ultimaBusquedaAFondo).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}</b></span>` : ''}
+      </div>
+      <div class="acciones">
+        <button class="boton claro" type="button" data-copiar="/radar ${esc(p.id)}">Copiar /radar ${esc(p.id)}</button>
+        <button class="boton claro" type="button" data-persona="nueva-clave">Nueva clave</button>
+        <button class="boton claro" type="button" data-persona="${p.activo ? 'quitar' : 'devolver'}">${p.activo ? 'Quitar acceso' : 'Devolver acceso'}</button>
+      </div>
+    </article>`).join('') : '<div class="vacio">Todavía no invitaste a nadie.</div>';
+}
+async function cargarPersonas() {
+  try { pintarPersonas((await api('personas')).personas); } catch { /* sin permiso: no es la dueña */ }
+}
+document.addEventListener('click', async (e) => {
+  const copiar = e.target.closest('[data-copiar]');
+  if (copiar) {
+    const texto = copiar.dataset.copiar;
+    if (copiar.classList.contains('boton')) await conRespuesta(copiar, { cargando: 'Copiando…', ok: '✓ Copiado', error: 'No se pudo' }, () => navigator.clipboard.writeText(texto));
+    else { try { await navigator.clipboard.writeText(texto); copiar.classList.add('copiado'); setTimeout(() => copiar.classList.remove('copiado'), 1800); } catch {} }
+    return;
+  }
+  const b = e.target.closest('[data-persona]');
+  if (!b) return;
+  const tarjeta = b.closest('.persona');
+  const id = tarjeta.dataset.id, nombre = tarjeta.querySelector('h3').textContent, accion = b.dataset.persona;
+  if (accion === 'quitar' && !confirm(`¿Sacarle el acceso a ${nombre}? Su radar queda guardado y se lo podés devolver cuando quieras.`)) return;
+  if (accion === 'nueva-clave' && !confirm(`¿Crear una clave nueva para ${nombre}? La que tiene ahora deja de funcionar.`)) return;
+  let r;
+  await conRespuesta(b, { cargando: 'Un momento…', ok: '✓ Listo', error: 'No se pudo' }, async () => { r = await api('personas', { accion, id }); });
+  if (r?.clave) mostrarClave(r.nombre, r.clave, false);
+  setTimeout(cargarPersonas, 900);
+});
+
+// Salir: borra la clave guardada en este navegador (útil si la compu es compartida o para probar como otra persona).
+$('#salir').onclick = () => {
+  if (!confirm('¿Salir de esta cuenta en este navegador? Para volver a entrar vas a necesitar la clave.')) return;
+  try { localStorage.removeItem('radar-clave'); } catch {}
+  location.reload();
+};
+
 // Inicio
 $('#fecha-hoy').textContent = new Date().toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
 (async () => {
   try {
     pintarEstado(await api('ajustes'));
+    if (!estado.quien.admin && !estado.perfilCompleto) { empezarBienvenida(); return; }
     estado.historial = (await api('historial')).historial;
     pintarTodo();
+    if (estado.quien.admin) cargarPersonas();
   } catch (e) {
     $('#avisos').innerHTML = `<div class="aviso error">${esc(e.message)}</div>`;
   }

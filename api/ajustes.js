@@ -1,5 +1,6 @@
 // Leer y cambiar ajustes (ubicación, modalidad, cuántas vacantes).
-import { autorizado, pedirClave } from '../lib/acceso.js';
+import { conPerfil } from '../lib/acceso.js';
+import { leerPerfil, perfilCompleto } from '../lib/perfiles.js';
 import { leerAjustes, guardarAjustes } from '../lib/almacen.js';
 import { UBICACIONES } from '../lib/ubicaciones.js';
 import { hayTelegram } from '../lib/telegram.js';
@@ -21,17 +22,19 @@ function limpiar(cuerpo = {}) {
   return c;
 }
 
-export default async function handler(req, res) {
-  if (!autorizado(req)) return pedirClave(res);
+export default (req, res) => conPerfil(req, res, async (quien) => {
   if (req.method === 'POST') {
     const cambios = limpiar(req.body);
     if (!Object.keys(cambios).length) return res.status(400).json({ error: 'No había nada válido para guardar' });
     await guardarAjustes(cambios);
   }
-  const ajustes = await leerAjustes();
+  const [ajustes, perfil] = await Promise.all([leerAjustes(), leerPerfil()]);
   res.json({
+    quien: { id: quien.id, nombre: perfil.nombre || quien.nombre, admin: quien.admin },
+    perfilCompleto: perfilCompleto(perfil),
+    pedido: ajustes.pedido || null,
     ajustes,
     ubicaciones: UBICACIONES.map(({ id, nombre }) => ({ id, nombre })),
     estado: { telegram: hayTelegram(), telegramConectado: Boolean(ajustes.telegramChatId), correoRevisado: ajustes.correoRevisado || null },
   });
-}
+});
