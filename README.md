@@ -1,6 +1,6 @@
 # Radar de vacantes
 
-Un buscador que trabaja al revés que un reclutador: en vez de buscar candidatas para una empresa, busca empresas para vos.
+Un experimento para que las vacantes te encuentren: busca ofertas publicadas hoy y te dice cuáles encajan con tu CV.
 Solo muestra ofertas **publicadas hoy**, descarta las que no podés tomar desde tu ubicación y nunca te repite una vacante.
 
 Tiene dos formas de buscar:
