@@ -4,12 +4,28 @@ import { leerAjustes, guardarAjustes } from '../lib/almacen.js';
 import { UBICACIONES } from '../lib/ubicaciones.js';
 import { hayTelegram } from '../lib/telegram.js';
 
-const PERMITIDOS = ['ubicacion', 'ubicacionLibre', 'modalidades', 'minimo', 'puntajeMinimo'];
+const MODALIDADES = ['remoto', 'hibrido', 'presencial'];
+const entre = (n, min, max) => Number.isFinite(n) && n >= min && n <= max;
+
+// Solo guarda valores válidos: un dato vacío o raro se ignora y queda el que tenías.
+function limpiar(cuerpo = {}) {
+  const c = {};
+  if (UBICACIONES.some((u) => u.id === cuerpo.ubicacion)) c.ubicacion = cuerpo.ubicacion;
+  if (typeof cuerpo.ubicacionLibre === 'string') c.ubicacionLibre = cuerpo.ubicacionLibre.trim().slice(0, 120);
+  if (Array.isArray(cuerpo.modalidades)) {
+    const m = cuerpo.modalidades.filter((x) => MODALIDADES.includes(x));
+    if (m.length) c.modalidades = m;
+  }
+  if (entre(cuerpo.minimo, 3, 6)) c.minimo = cuerpo.minimo;
+  if (entre(cuerpo.puntajeMinimo, 40, 85)) c.puntajeMinimo = cuerpo.puntajeMinimo;
+  return c;
+}
 
 export default async function handler(req, res) {
   if (!autorizado(req)) return pedirClave(res);
   if (req.method === 'POST') {
-    const cambios = Object.fromEntries(Object.entries(req.body || {}).filter(([k]) => PERMITIDOS.includes(k)));
+    const cambios = limpiar(req.body);
+    if (!Object.keys(cambios).length) return res.status(400).json({ error: 'No había nada válido para guardar' });
     await guardarAjustes(cambios);
   }
   const ajustes = await leerAjustes();

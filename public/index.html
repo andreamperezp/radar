@@ -116,9 +116,20 @@ select, input[type="text"], input[type="password"] { width: 100%; font: inherit;
 .opciones input { accent-color: var(--coral-fuerte); }
 input[type="range"] { width: 100%; accent-color: var(--coral-fuerte); }
 .fila { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.boton { border: 0; background: var(--tinta); color: var(--fondo); border-radius: 10px; padding: 10px 16px; font-weight: 700; font-size: 14px; }
-.boton.claro { background: none; color: var(--tinta); border: 1px solid var(--linea); }
-.guardado { font-size: 13px; color: var(--menta-fuerte); font-weight: 700; }
+.boton { position: relative; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--tinta); background: var(--tinta); color: var(--fondo); border-radius: 10px; padding: 10px 16px; font-weight: 700; font-size: 14px; transition: transform .12s ease, box-shadow .15s ease, background-color .15s ease, color .15s ease, border-color .15s ease; }
+.boton.claro { background: none; color: var(--tinta); border-color: var(--linea); }
+.boton:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,.18); }
+.boton.claro:hover { border-color: var(--tinta-suave); background: color-mix(in srgb, var(--tinta) 6%, transparent); }
+.boton:active { transform: translateY(1px) scale(.98); box-shadow: none; }
+.boton:focus-visible, .boton-buscar:focus-visible, .pestanas button:focus-visible { outline: 3px solid var(--coral); outline-offset: 2px; }
+.boton[data-estado="cargando"] { cursor: progress; opacity: .85; transform: none; }
+.boton[data-estado="cargando"]::before { content: ''; width: 12px; height: 12px; border-radius: 50%; border: 2px solid currentColor; border-top-color: transparent; animation: girar .7s linear infinite; }
+.boton[data-estado="ok"] { background: #3FAF7A; border-color: #3FAF7A; color: #fff; animation: confirmado .35s ease; }
+.boton[data-estado="error"] { background: var(--coral); border-color: var(--coral); color: #1E2430; animation: sacudir .35s ease; }
+@keyframes confirmado { 0% { transform: scale(.94); } 60% { transform: scale(1.04); } 100% { transform: scale(1); } }
+@keyframes sacudir { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+.boton:disabled:not([data-estado]) { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+@media (prefers-reduced-motion: reduce) { .boton, .boton[data-estado] { animation: none; transition: none; } }
 .pasos-tg { margin: 0; padding-left: 20px; font-size: 14px; color: var(--tinta-suave); }
 .pasos-tg li { margin-bottom: 4px; }
 .pasos-tg code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--fondo); padding: 1px 5px; border-radius: 4px; }
@@ -276,7 +287,7 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
   <!-- AJUSTES -->
   <section id="ajustes" hidden>
     <h2>Ajustes</h2>
-    <p class="sub">La búsqueda automática de cada día usa estos mismos ajustes.</p>
+    <p class="sub">El botón de búsqueda rápida y <span class="mono">/radar</span> usan estos ajustes.</p>
     <form class="panel" id="form-ajustes">
       <div class="fila">
         <div class="campo">
@@ -306,7 +317,7 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
           <small>Más alto = menos vacantes, pero más afines a tu perfil.</small>
         </div>
       </div>
-      <div><button class="boton" type="submit">Guardar ajustes</button> <span class="guardado" id="guardado" hidden>Guardado ✓</span></div>
+      <div><button class="boton" type="submit" id="guardar-ajustes" disabled>Guardar ajustes</button></div>
     </form>
 
     <h2>Avisos por Telegram</h2>
@@ -425,32 +436,57 @@ function pintarEstado(datos) {
   document.querySelectorAll('[name="modalidades"]').forEach((c) => { c.checked = a.modalidades.includes(c.value); });
   $('#minimo').value = a.minimo; $('#puntajeMinimo').value = a.puntajeMinimo;
   pintarRangos();
+  $('#guardar-ajustes').disabled = false; // recién ahora hay ajustes cargados para guardar
 }
 function pintarRangos() { $('#v-minimo').textContent = $('#minimo').value; $('#v-puntaje').textContent = `${$('#puntajeMinimo').value}%`; }
 $('#minimo').oninput = pintarRangos; $('#puntajeMinimo').oninput = pintarRangos;
 $('#ubicacion').onchange = () => { $('#ubicacionLibre').hidden = $('#ubicacion').value !== 'otra'; };
 
+// Botón con respuesta visible: "Guardando…" mientras trabaja, "✓ Guardado" si salió bien, el error si falló.
+async function conRespuesta(boton, textos, accion) {
+  if (boton.dataset.estado === 'cargando') return;
+  const original = boton.dataset.original || boton.textContent;
+  boton.dataset.original = original;
+  clearTimeout(boton._volver);
+  boton.dataset.estado = 'cargando';
+  boton.setAttribute('aria-busy', 'true');
+  boton.textContent = textos.cargando;
+  const minimo = new Promise((r) => setTimeout(r, 450)); // que la ruedita alcance a verse
+  let ok = true, detalle = '';
+  try { await Promise.all([accion(), minimo]); } catch (e) { ok = false; detalle = e.message; await minimo; }
+  boton.removeAttribute('aria-busy');
+  boton.dataset.estado = ok ? 'ok' : 'error';
+  boton.textContent = ok ? textos.ok : textos.error || 'No se pudo';
+  if (!ok && detalle) boton.title = detalle;
+  boton._volver = setTimeout(() => { boton.dataset.estado = ''; boton.textContent = original; boton.title = ''; }, ok ? 2200 : 4000);
+  return { ok, detalle };
+}
+
 $('#form-ajustes').onsubmit = async (e) => {
   e.preventDefault();
+  if (!estado.ajustes || !$('#ubicacion').value) return; // todavía no cargaron tus ajustes
   const modalidades = [...document.querySelectorAll('[name="modalidades"]:checked')].map((c) => c.value);
-  const datos = await api('ajustes', {
-    ubicacion: $('#ubicacion').value, ubicacionLibre: $('#ubicacionLibre').value,
-    modalidades: modalidades.length ? modalidades : ['remoto'],
-    minimo: Number($('#minimo').value), puntajeMinimo: Number($('#puntajeMinimo').value),
+  await conRespuesta($('#guardar-ajustes'), { cargando: 'Guardando…', ok: '✓ Guardado', error: 'No se pudo guardar' }, async () => {
+    pintarEstado(await api('ajustes', {
+      ubicacion: $('#ubicacion').value, ubicacionLibre: $('#ubicacionLibre').value,
+      modalidades: modalidades.length ? modalidades : ['remoto'],
+      minimo: Number($('#minimo').value), puntajeMinimo: Number($('#puntajeMinimo').value),
+    }));
   });
-  pintarEstado(datos);
-  $('#guardado').hidden = false; setTimeout(() => { $('#guardado').hidden = true; }, 2200);
 };
 
 // Telegram
+const TEXTOS_TG = {
+  conectar: { cargando: 'Conectando…', ok: '✓ Conectado', error: 'No se pudo conectar', listo: '✓ Conectado. Revisá Telegram: te mandé un saludo.' },
+  probar: { cargando: 'Enviando…', ok: '✓ Enviada', error: 'No se pudo enviar', listo: '✓ Prueba enviada. Fijate en Telegram.' },
+};
 async function accionTelegram(accion, boton) {
-  boton.disabled = true;
-  try { await api('telegram', { accion }); $('#tg-estado').textContent = accion === 'conectar' ? '✓ Conectado. Revisá Telegram.' : '✓ Mensaje enviado.'; pintarEstado(await api('ajustes')); }
-  catch (e) { $('#tg-estado').textContent = e.message; }
-  boton.disabled = false;
+  const t = TEXTOS_TG[accion];
+  const r = await conRespuesta(boton, t, async () => { await api('telegram', { accion }); pintarEstado(await api('ajustes')); });
+  if (r) $('#tg-estado').textContent = r.ok ? t.listo : r.detalle;
 }
-$('#tg-conectar').onclick = (e) => accionTelegram('conectar', e.target);
-$('#tg-probar').onclick = (e) => accionTelegram('probar', e.target);
+$('#tg-conectar').onclick = (e) => accionTelegram('conectar', e.currentTarget);
+$('#tg-probar').onclick = (e) => accionTelegram('probar', e.currentTarget);
 
 // /radar: copiar el comando
 $('#copiar-radar').onclick = async (e) => {
