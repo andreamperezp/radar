@@ -293,8 +293,8 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px
 .zona-quitar { display: none; grid-column: 1 / -1; text-align: center; font-size: 14px; font-weight: 600; color: var(--gris); border: 2px dashed var(--linea); border-radius: 14px; padding: 16px; }
 .arrastrando .zona-quitar { display: block; position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 40; max-width: 948px; margin: 0 auto; background: var(--tarjeta); box-shadow: var(--sombra); }
 .mails { list-style: none; margin: 0; padding: 8px 0 0; border-top: 1px dashed var(--linea); display: grid; gap: 4px; }
-.mail { display: grid; grid-template-columns: 18px 1fr auto; gap: 6px; align-items: center; font-size: 12px; }
-.mail a { font-weight: 600; font-size: 12px; text-decoration: none; color: var(--tinta-suave); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mail { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 6px; align-items: center; font-size: 12px; }
+.mail a { min-width: 0; font-weight: 600; font-size: 12px; text-decoration: none; color: var(--tinta-suave); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mail a:hover { text-decoration: underline; }
 .mail.avance a, .mail.oferta a { color: var(--tinta); font-weight: 800; }
 .mail time { color: var(--gris); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
@@ -859,7 +859,7 @@ $('#copiar-radar').onclick = async (e) => {
 // Ayudas para el historial
 const SEGUIMIENTO = ['aplicada', 'entrevista', 'oferta', 'rechazada'];
 const ETAPAS = { aplicada: ['Aplicada', 'var(--menta)'], entrevista: ['Entrevista', 'var(--sol)'], oferta: ['Oferta', 'var(--menta-fuerte)'], rechazada: ['No quedó', 'var(--coral)'] };
-const MAILS = { recibido: ['📩', 'Recibieron tu postulación'], avance: ['📅', 'Te invitaron a avanzar'], oferta: ['🎉', 'Te hicieron una oferta'], rechazo: ['💌', 'Respondieron que no'] };
+const MAILS = { recibido: ['📩', 'Postulación confirmada'], vista: ['👀', 'Vieron tu postulación'], avance: ['📅', 'Te invitaron a avanzar'], oferta: ['🎉', 'Te hicieron una oferta'], rechazo: ['💌', 'Respondieron que no'] };
 const normalizarUrl = (u = '') => u.split('?')[0].split('#')[0].replace(/\/$/, '').toLowerCase();
 const normalizarEmpresa = (n = '') => n.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
   .replace(/\b(inc|llc|ltd|s\.?a\.?|s\.?r\.?l\.?|sas|corp|co|gmbh)\b\.?/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
@@ -891,7 +891,7 @@ function tarjeta(v, i = 0) {
     otra ? `<div class="sello empresa">⚠️ Ya aplicaste en ${esc(v.empresa)}: “${esc(otra.titulo)}” (${esc(fechaCorta(otra.aplicadaEl))})</div>` : '',
   ].join('');
   return `<article class="vacante ${enSeguimiento ? 'en-seguimiento' : etapa === 'descartada' ? 'descartada' : ''}" style="animation-delay:${i * 60}ms" data-url="${esc(v.url)}">
-    <div class="anillo" style="--p:${v.puntaje};--color:${colorPuntaje(v.puntaje)}"><span>${v.puntaje}%</span></div>
+    <div class="anillo" style="--p:${v.puntaje ?? 0};--color:${colorPuntaje(v.puntaje ?? 0)}" title="${v.puntaje == null ? 'Llegó por mail: sin puntaje' : ''}"><span>${v.puntaje == null ? '✉️' : `${v.puntaje}%`}</span></div>
     <div>
       ${sellos}
       <h3>${esc(v.titulo)}</h3>

@@ -16,12 +16,16 @@
  *  3. Elegí la función "instalar" arriba y tocá Ejecutar. Google te pide permiso: aceptalo.
  */
 
-// Palabras que suelen aparecer en mails de procesos de selección (español e inglés).
+// Palabras de respaldo. Las que se usan de verdad las manda tu web en cada revisión
+// (así se mejoran sin tener que volver a pegar este script).
 var PALABRAS = [
-  'entrevista', 'interview', 'postulación', 'postulacion', 'postularte', 'postulaste', 'candidatura',
-  'application', 'applying', 'proceso de selección', '"next steps"', '"próximos pasos"', 'oferta', 'offer',
+  'entrevista', 'interview', 'postulación', 'postulacion', 'postularte', 'postulaste', 'candidatura', 'solicitud',
+  'application', 'applying', 'applied', '"proceso de selección"', '"next steps"', '"próximos pasos"', 'oferta', 'offer',
   'lamentablemente', 'unfortunately', 'calendly', 'desafío', 'challenge', 'assessment', '"thank you for your interest"'
 ];
+
+// Cuántos días hacia atrás mira al instalar (para recuperar lo que no se había leído).
+var DIAS_AL_INSTALAR = 7;
 
 // Cada cuántas horas revisar. Google solo deja programar cada 1, 2, 4, 6, 8 o 12 horas,
 // así que el script se despierta cada hora y revisa solo cuando pasaron estas horas.
@@ -31,8 +35,10 @@ function instalar() {
   // Borra programaciones anteriores de este script y crea una que se despierta cada hora.
   ScriptApp.getProjectTriggers().forEach(function (t) { ScriptApp.deleteTrigger(t); });
   ScriptApp.newTrigger('cadaHora').timeBased().everyHours(1).create();
+  // Al instalar, vuelve a mirar los últimos días: el radar ignora lo que ya tenía y suma lo que faltaba.
+  PropertiesService.getScriptProperties().setProperty('ULTIMA_REVISION', String(Date.now() - DIAS_AL_INSTALAR * 24 * 3600 * 1000));
   revisar();
-  Logger.log('Listo: el radar va a revisar tu Gmail cada ' + CADA_HORAS + ' horas y te avisa por Telegram al terminar.');
+  Logger.log('Listo: revisé los últimos ' + DIAS_AL_INSTALAR + ' días y desde ahora reviso tu Gmail cada ' + CADA_HORAS + ' horas.');
 }
 
 // La llama Google cada hora: revisa solo si ya pasaron CADA_HORAS desde la última vez.
@@ -58,21 +64,32 @@ function revisar() {
   var desde = Number(props.getProperty('ULTIMA_REVISION')) || ahora - 3 * 24 * 3600 * 1000;
   var yo = Session.getActiveUser().getEmail().toLowerCase();
 
-  var consulta = 'after:' + Math.floor(desde / 1000) + ' -in:sent -in:chats -category:promotions -category:social {' + PALABRAS.join(' ') + '}';
-  var hilos = GmailApp.search(consulta, 0, 40);
+  // Las palabras a buscar las da la web; si no responde, se usan las de respaldo.
+  var palabras = PALABRAS;
+  try {
+    var config = UrlFetchApp.fetch(sitio + '/api/correo', { headers: { 'x-clave': clave }, muteHttpExceptions: true });
+    if (config.getResponseCode() === 200) palabras = JSON.parse(config.getContentText()).palabras || PALABRAS;
+  } catch (e) { /* seguimos con las de respaldo */ }
+
+  // Sin excluir "Social" ni "Promociones": Gmail suele guardar ahí los mails de LinkedIn.
+  var consulta = 'after:' + Math.floor(desde / 1000) + ' -in:sent -in:chats {' + palabras.join(' ') + '}';
+  var hilos = GmailApp.search(consulta, 0, 80);
   var correos = [];
 
   hilos.forEach(function (hilo) {
     hilo.getMessages().forEach(function (m) {
       if (m.getDate().getTime() < desde) return;
       if (m.getFrom().toLowerCase().indexOf(yo) !== -1) return; // tus propios mails
+      var cuerpo = m.getPlainBody();
+      var oferta = cuerpo.match(/https?:\/\/[^\s<>"]*(?:linkedin\.com\/(?:comm\/)?jobs\/view\/\d+|computrabajo\.com\/ofertas-de-trabajo\/[^\s<>"]+)/);
       correos.push({
         id: m.getId(),
         de: m.getFrom(),
         asunto: m.getSubject(),
-        extracto: m.getPlainBody().replace(/\s+/g, ' ').slice(0, 1500),
+        extracto: cuerpo.replace(/\s+/g, ' ').slice(0, 1500),
         fecha: m.getDate().toISOString(),
-        enlace: 'https://mail.google.com/mail/u/0/#all/' + hilo.getId()
+        enlace: 'https://mail.google.com/mail/u/0/#all/' + hilo.getId(),
+        enlaceOferta: oferta ? oferta[0] : ''
       });
     });
   });
