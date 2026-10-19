@@ -491,9 +491,9 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
           <span class="chip"><span class="punto" id="punto-tg"></span><span id="txt-tg">Telegram</span></span>
         </div>
         <button class="boton-buscar" id="buscar">BUSCAR NUEVO PROYECTO <span class="flecha" aria-hidden="true">→</span></button>
-        <p class="nota-boton">Búsqueda rápida y gratis en Get on Board, Himalayas y Remote OK.</p>
+        <p class="nota-boton">Búsqueda rápida y gratis en 11 portales: LinkedIn, Computrabajo, We Work Remotely, Get on Board, Himalayas, Remote OK, Jobicy, Remote First Jobs, Jobspresso, Nodesk y Arbeitnow.</p>
         <ol class="pasos" id="pasos" hidden>
-          <li>Revisando Get on Board, Himalayas y Remote OK</li>
+          <li>Revisando 11 portales: LinkedIn, Computrabajo, We Work Remotely y más</li>
           <li>Dejando solo lo publicado hoy y que podés tomar</li>
           <li>Ordenando por afinidad con tu perfil</li>
         </ol>
@@ -504,14 +504,14 @@ footer { margin-top: 56px; font-size: 13px; color: var(--gris); text-align: cent
     <aside class="a-fondo" id="a-fondo-duena" hidden>
       <div>
         <div class="kicker mono">Búsqueda a fondo · con Claude</div>
-        <p>Escribí <button class="comando mono" id="copiar-radar" title="Copiar">/radar</button> en Claude Code. Busca también en LinkedIn, Computrabajo y Bumeran, lee cada oferta contra tu CV y te la manda acá y a Telegram. Usa tu plan Pro, así que solo corre cuando se lo pedís.</p>
+        <p>Escribí <button class="comando mono" id="copiar-radar" title="Copiar">/radar</button> en Claude Code. Además de los 11 portales, busca en internet (Bumeran, Indeed, InfoJobs…), lee cada oferta contra tu CV y te la manda acá y a Telegram. Usa tu plan Pro, así que solo corre cuando se lo pedís.</p>
         <p class="pedidos-espera" id="pedidos-espera" hidden></p>
       </div>
     </aside>
     <aside class="a-fondo" id="a-fondo-invitado" hidden>
       <div class="a-fondo-texto">
         <div class="kicker mono">Búsqueda a fondo · con Claude</div>
-        <p>Claude busca también en LinkedIn, Computrabajo y Bumeran, lee cada oferta contra tu CV y te explica por qué encaja. Lo corre <b id="nombre-duena">Andrea</b> desde su cuenta: pedila acá y te llega a tu radar y a tu Telegram.</p>
+        <p>Claude revisa los 11 portales y además busca en internet, lee cada oferta contra tu CV y te explica por qué encaja. Lo corre <b id="nombre-duena">Andrea</b> desde su cuenta: pedila acá y te llega a tu radar y a tu Telegram.</p>
         <p class="estado-pedido" id="estado-pedido" hidden></p>
       </div>
       <div class="a-fondo-accion">
@@ -975,7 +975,9 @@ $('#buscar').onclick = async () => {
     const { vacantes, informe } = await api('buscar', {});
     document.querySelectorAll('#pasos li').forEach((p) => { p.className = 'hecho'; });
     $('#informe').hidden = false;
-    $('#informe').innerHTML = `<span>📅 <b>${esc(informe.hoy)}</b></span><span><b>${informe.encontradasHoy ?? 0}</b> publicadas hoy</span><span><b>${informe.revisadas}</b> nuevas que podés tomar desde ${esc(informe.ubicacion)}</span><span><b>${vacantes.length}</b> valen la pena</span>`;
+    const portales = Object.values(informe.porPortal || {});
+    const respondieron = portales.filter((n) => n !== null).length;
+    $('#informe').innerHTML = `<span>📅 <b>${esc(informe.hoy)}</b></span><span><b>${respondieron}</b>${portales.length && respondieron < portales.length ? ` de ${portales.length}` : ''} portales revisados</span><span><b>${informe.encontradasHoy ?? 0}</b> publicadas hoy</span><span><b>${informe.revisadas}</b> nuevas que podés tomar desde ${esc(informe.ubicacion)}</span><span><b>${vacantes.length}</b> valen la pena</span>`;
     $('#avisos').innerHTML = (informe.avisos || []).map((a) => `<div class="aviso">${esc(a)}</div>`).join('');
     if (!vacantes.length) {
       $('#resultados').innerHTML = `<div class="vacio"><b>No apareció nada nuevo a tu altura.</b><br>Las empresas publican durante todo el día: probá más tarde, o corré <span class="mono">/radar</span> para buscar también en LinkedIn y Computrabajo.</div>`;

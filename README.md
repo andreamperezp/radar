@@ -7,7 +7,7 @@ Tiene dos formas de buscar:
 
 | | Botón **BUSCAR NUEVO PROYECTO** (web) | **/radar** en Claude Code |
 |---|---|---|
-| Dónde busca | Get on Board, Himalayas, Remote OK | Lo mismo + LinkedIn, Computrabajo, Bumeran, ZonaJobs, Indeed, InfoJobs |
+| Dónde busca | 11 portales: LinkedIn, Computrabajo, We Work Remotely, Get on Board, Himalayas, Remote OK, Jobicy, Remote First Jobs, Jobspresso, Nodesk, Arbeitnow | Lo mismo + búsqueda en internet (Bumeran, ZonaJobs, Indeed, InfoJobs…) |
 | Cómo elige | Palabras clave | Claude lee cada oferta contra tu CV y te explica por qué encaja |
 | Costo | Gratis | Usa tu plan Pro de Claude, sin pagar nada extra |
 | Aviso a Telegram | No | Sí |
@@ -80,7 +80,7 @@ api/historial.js      Historial, etapas de seguimiento y notas
 api/ajustes.js        Ubicación, modalidad y exigencia
 api/telegram.js       Conectar tu chat y mandar una prueba
 lib/perfil.js         Tu CV resumido: si actualizás el CV, actualizá este texto
-lib/fuentes.js        Bolsas de empleo con fecha exacta
+lib/fuentes.js        Los 11 portales (todos con fecha exacta de publicación)
 lib/match.js          Filtro de hoy y puntaje por palabras clave
 lib/almacen.js        Guardado (Vercel Blob) y marcas de "ya aplicaste"
 scripts/radar.mjs     Puente entre /radar y la web
